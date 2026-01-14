@@ -1,8 +1,7 @@
 # Project Progress Tracker
 
 **Project:** GZ Businessplan Generator  
-**Last Updated:** 2026-01-14  
-**Status:** 🔵 Foundation Complete - Ready for Implementation
+**Last Updated:** 2026-01-14
 
 ---
 
@@ -12,14 +11,17 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 PROJECT PHASES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Phase 0: Planning & Architecture (COMPLETE)
-⬚ Phase 1: Project Setup (Days 1-3)
-⬚ Phase 2: Core UI (Days 4-6)
-⬚ Phase 3: Claude Integration (Days 7-9)
-⬚ Phase 4: Module Implementation (Days 10-24)
-⬚ Phase 5: Quality & Deploy (Days 25-30)
+✅ Phase 1: Architecture & Skills Definition
+✅ Phase 2: Database Schema & RLS Policies  
+🔄 Phase 3: Frontend Foundation (IN PROGRESS - 60%)
+⬚ Phase 4: Backend API Routes
+⬚ Phase 5: Claude Integration
+⬚ Phase 6: Module Implementation (13 modules)
+⬚ Phase 7: Document Generation
+⬚ Phase 8: Testing & Accessibility
+⬚ Phase 9: Deployment & Monitoring
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Progress: 1/6 Phases (17%)
+Progress: 2.6/9 Phases (29%)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -27,342 +29,216 @@ Progress: 1/6 Phases (17%)
 
 ## Completed Features
 
-### ✅ Phase 0: Planning & Architecture
+### ✅ Database & Auth (Phase 2)
+- [x] Supabase project setup (Frankfurt region)
+- [x] User authentication with Google OAuth
+- [x] Workshop, modules, conversations tables
+- [x] RLS policies for data isolation
+- [x] Database migrations system
 
-**Completed:** 2026-01-14
+### ✅ Skills Definition (Phase 1)
+- [x] gz-orchestrator (master controller)
+- [x] All 13 module skills (intake → zusammenfassung)
+- [x] gz-tech-architecture (system design)
+- [x] gz-tech-frontend (UI patterns)
+- [x] gz-tech-backend (API implementation)
+- [x] gz-tech-database (schema & RLS)
 
-- [x] All 10 business modules designed and streamlined
-- [x] Module 01 (Intake) - Coaching Integration added
-- [x] Module 05 (Marketing) - Full Conversation Flow expanded
-- [x] Module 06 (Finanzplanung) - YAML header + Coaching Integration fixed
-- [x] 6 coaching methodology skills defined (MI, CBC, AI, SDT, Stage, Core)
-- [x] Technical architecture documented
-- [x] Database schema designed (Supabase + RLS)
-- [x] Development strategy finalized (Ralph + Manual hybrid)
-- [x] CLAUDE.md production guide created
-- [x] Cost estimates completed ($450-650 dev, $200-250/mo ops)
-
-**Deliverables:**
-- 📄 CLAUDE.md (38KB comprehensive guide)
-- 📄 10 streamlined module files (1,300-1,800 lines each)
-- 📄 6 coaching skill files
-- 📄 3 technical architecture skills
-- 📄 GZ_DEVELOPMENT_STRATEGY.md
-- 📄 GZ_PRODUCT_REQUIREMENTS_DOCUMENT.md
-
-**Key Decisions:**
-1. **Tech Stack Finalized:** Next.js 15, Supabase, Claude Sonnet 4.5
-2. **Canvas Pattern Selected:** Split-view (desktop) + tabs (mobile)
-3. **State Management:** Jotai + IndexedDB (offline-first)
-4. **Financial Engine:** decimal.js (mandatory for BA compliance)
-5. **Coaching Framework:** 4 methodologies (MI, CBC, AI, SDT)
-6. **Development Approach:** Hybrid (Ralph autonomous + manual strategic)
+### ✅ Next.js Foundation Setup (Phase 3 - Initial)
+- [x] Project initialization with Next.js 15 + React 19
+- [x] TypeScript strict mode configuration
+- [x] Tailwind CSS + shadcn/ui setup (dark mode, animations)
+- [x] Canvas Pattern UI foundation (split-view layout)
+- [x] Supabase SSR auth middleware
+- [x] Security headers configuration
+- [x] Dependency resolution (vaul + React 19)
+- [x] Dev server running successfully
 
 ---
 
-## Current Focus
+## In Progress
 
-### 🔵 Phase 1: Project Setup (Next - Days 1-3)
+### 🔄 Frontend Foundation (Phase 3 - 60% Complete)
+**Current Focus:** Supabase integration and state management
 
-**Goal:** Initialize project with proper foundation
+**Completed:**
+- [x] Next.js 15 project initialization (Step 10-12)
+- [x] Tailwind CSS + shadcn/ui setup (Step 12)
+- [x] TypeScript strict mode configuration (Step 10)
+- [x] Canvas Pattern UI placeholder (Step 12)
+- [x] Folder structure (/src/app, /src/components, /src/lib)
 
-**Tasks:**
-- [ ] Initialize Next.js 15 project with TypeScript strict mode
-- [ ] Install core dependencies (see package.json template in CLAUDE.md)
-- [ ] Configure Tailwind CSS + shadcn/ui
-- [ ] Set up Supabase project (Frankfurt region)
-- [ ] Create database schema with migrations
-- [ ] Implement RLS policies
-- [ ] Configure Google OAuth
-- [ ] Set up environment variables (Zod validation)
-- [ ] Create basic app layout structure
-- [ ] Verify TypeScript strict mode (0 errors)
+**Next (Step 13-15):**
+- [ ] Supabase Cloud setup (Frankfurt region)
+- [ ] Create .env.local with API keys
+- [ ] Test authentication flow
+- [ ] Verify middleware protection
 
-**Estimated Time:** 2-3 days  
-**Priority:** 🔴 Critical (blocks everything else)
-
----
-
-## Upcoming Phases
-
-### ⬚ Phase 2: Core UI (Days 4-6)
-
-**Tasks:**
-- [ ] Canvas Pattern: Split-view layout
-- [ ] Parallel Routes: @chat and @preview
-- [ ] Chat interface components
-- [ ] Preview panel with module cards
-- [ ] Jotai atoms setup
+**After Supabase (Step 16-20):**
+- [ ] Jotai atoms for state management
 - [ ] IndexedDB persistence layer
-- [ ] URL state management (nuqs)
-- [ ] Mobile responsive (tabs)
+- [ ] URL state with nuqs
+- [ ] Canvas layout with resize handle
 
-**Estimated Time:** 3 days  
-**Dependencies:** Phase 1 complete
+**Blocked:**
+- [ ] Streaming extraction (needs backend /api/chat first)
+
+**Timeline:**
+- Steps 10-12 (Foundation): ✅ Complete (Jan 14)
+- Steps 13-15 (Supabase): 🔄 Next (Jan 14)
+- Steps 16-20 (State/UI): ⬚ After Supabase
+- Steps 21-25 (Integration): ⬚ Final phase
 
 ---
 
-### ⬚ Phase 3: Claude Integration (Days 7-9)
+## Upcoming Features
 
-**Tasks:**
-- [ ] /api/chat route with Vercel AI SDK
-- [ ] Streaming response handler
-- [ ] Streaming JSON extraction (partial-json)
-- [ ] Skill prompt system (load from files)
-- [ ] Zero Data Retention header (DSGVO)
+### ⬚ Backend API Routes (Phase 4)
+- [ ] /api/auth/* - Authentication endpoints
+- [ ] /api/chat - Claude streaming integration
+- [ ] /api/workshop/* - CRUD operations
+- [ ] /api/export/* - Document generation queue
+- [ ] Rate limiting middleware (Upstash Redis)
+
+### ⬚ Claude Integration (Phase 5)
+- [ ] Vercel AI SDK setup
+- [ ] Streaming JSON extraction
+- [ ] Prompt caching configuration
+- [ ] Zero Data Retention header
 - [ ] Usage tracking (Langfuse)
-- [ ] Response caching strategy
-- [ ] Rate limiting (Upstash Redis)
 
-**Estimated Time:** 3 days  
-**Dependencies:** Phase 1-2 complete
-
----
-
-### ⬚ Phase 4: Module Implementation (Days 10-24)
-
-**Implementation Order (by dependency):**
-
-**Week 1: Foundation Modules**
-- [ ] Module 01: Intake (no deps)
-- [ ] Module 02: Geschäftsmodell (needs 01)
-- [ ] Module 03: Unternehmen (needs 01-02)
-
-**Week 2: Market & Marketing**
-- [ ] Module 04: Markt & Wettbewerb (needs 01-03)
-- [ ] Module 05: Marketing (needs 01-04)
-
-**Week 3: Finance & Strategy**
-- [ ] Module 06: Finanzplanung (needs 02-05) ⭐ CRITICAL
-- [ ] Module 07: SWOT (needs 01-06)
-- [ ] Module 08: Meilensteine (needs 01-07)
-
-**Week 4: Final Modules**
-- [ ] Module 09: KPIs (needs 01-08)
-- [ ] Module 10: Zusammenfassung (needs 01-09)
-
-**Estimated Time:** 15 days  
-**Dependencies:** Phase 1-3 complete
+### ⬚ Module Implementation (Phase 6)
+Individual module workflows (coaching + validation):
+- [ ] Module 1: Intake & Assessment
+- [ ] Module 2: Geschäftsmodell
+- [ ] Module 3: Unternehmen
+- [ ] Module 4: Markt & Wettbewerb
+- [ ] Module 5: Marketingkonzept
+- [ ] Module 6: Finanzplanung (most complex)
+- [ ] Module 7: SWOT-Analyse
+- [ ] Module 8: Meilensteine
+- [ ] Module 9: KPIs
+- [ ] Module 10: Zusammenfassung
 
 ---
 
-### ⬚ Phase 5: Quality & Deploy (Days 25-30)
+## Known Issues
 
-**Tasks:**
-- [ ] Financial math engine tests (decimal.js)
-- [ ] Cross-module validation
-- [ ] Validator module implementation
-- [ ] Document Generator (.docx/.pdf export)
-- [ ] Orchestrator (state machine)
-- [ ] Accessibility audit (WCAG 2.2 AA)
-- [ ] E2E tests (Playwright)
-- [ ] Compliance checks (ast-grep)
-- [ ] Performance optimization
-- [ ] Deploy to Vercel
-- [ ] Production monitoring setup
+### High Priority 🔴
+1. **Issue:** [Description]
+   - **Impact:** [Business/User impact]
+   - **Workaround:** [Temporary fix if any]
+   - **Fix Planned:** [When/how]
 
-**Estimated Time:** 6 days  
-**Dependencies:** Phase 1-4 complete
+### Medium Priority 🟡
+1. **Issue:** [Description]
+   - **Impact:** [Business/User impact]
+
+### Low Priority 🟢
+1. **Issue:** [Description]
+   - **Impact:** [Business/User impact]
+
+---
+
+## Technical Debt
+
+### Must Fix Before Launch
+- [ ] Item 1: [Description and why it matters]
+- [ ] Item 2: [Description and why it matters]
+
+### Can Wait for v2
+- [ ] Item 1: [Description]
+- [ ] Item 2: [Description]
 
 ---
 
 ## Metrics & KPIs
 
 ### Development Velocity
+- **Features Completed This Week:** [Number]
+- **Average Time per Feature:** [Duration]
 
-- **Completed Phases:** 1/6 (17%)
-- **Days Elapsed:** 0 (planning phase)
-- **Estimated Days Remaining:** 30
+### Code Quality
+- **TypeScript Strict Errors:** 0 (target)
+- **Test Coverage:** [Percentage]
+- **Accessibility Score:** [WCAG level]
 
-### Code Quality (Targets)
-
-- **TypeScript Strict Errors:** 0 (mandatory)
-- **Test Coverage:** >80%
-- **Accessibility Score:** WCAG 2.2 AA
-- **Financial Calculation Accuracy:** 100% (decimal.js)
-- **DSGVO Compliance:** 100% (ZDR header, no PII)
-
-### Technical Debt
-
-**Current:** None (greenfield project)
-
-**To Monitor:**
-- RLS policy coverage (all tables)
-- Test coverage (unit + E2E)
-- Accessibility compliance
-- Performance budget (<3s FCP, <5s LCP)
+### Dependencies
+- **Outdated Packages:** [Number]
+- **Security Vulnerabilities:** 0 (target)
 
 ---
 
-## Risk Register
+## Decisions Log
 
-### Active Risks
+### Recent Decisions
+1. **Date:** 2026-01-12  
+   **Decision:** Use Jotai instead of Redux  
+   **Rationale:** Atomic state, better performance, smaller bundle  
+   **Alternatives:** Redux Toolkit, Zustand  
 
-1. **Risk:** Module 06 (Finanzplanung) complexity
-   - **Probability:** Medium
-   - **Impact:** High (BA rejection if math wrong)
-   - **Mitigation:** Manual review of decimal.js implementation, extensive testing
-   - **Status:** Mitigated (decimal.js mandatory, tests required)
-
-2. **Risk:** DSGVO compliance gaps
-   - **Probability:** Low
-   - **Impact:** Critical (legal issues)
-   - **Mitigation:** ZDR header mandatory, compliance checks in CI/CD, Frankfurt hosting
-   - **Status:** Mitigated (documented in CLAUDE.md)
-
-3. **Risk:** Accessibility deadline (EAA June 2025)
-   - **Probability:** Low
-   - **Impact:** High (legal requirement)
-   - **Mitigation:** WCAG 2.2 AA from start, axe-core tests, keyboard nav required
-   - **Status:** Mitigated (documented in testing strategy)
-
----
-
-## Key Decisions Log
-
-### Architecture Decisions
-
-1. **2026-01-14:** Tech stack finalized
-   - Next.js 15 (App Router with RSC)
-   - Supabase (PostgreSQL + Auth + Storage)
-   - Claude Sonnet 4.5 (best reasoning)
-   - Rationale: Production-grade, DSGVO-compliant, cost-effective
-
-2. **2026-01-14:** Canvas Pattern for UI
-   - Split-view (desktop), tabs (mobile)
-   - Parallel Routes (@chat, @preview)
-   - Rationale: Proven pattern, better UX, real-time preview
-
-3. **2026-01-14:** Jotai + IndexedDB for state
-   - Jotai atoms (lightweight)
-   - IndexedDB persistence (offline-first)
-   - Rationale: Fast, offline-capable, type-safe
-
-4. **2026-01-14:** decimal.js mandatory
-   - ALL financial calculations use decimal.js
-   - NO floating point arithmetic allowed
-   - Rationale: BA compliance, exact arithmetic
-
-5. **2026-01-14:** Ralph autonomous development
-   - Hybrid approach (manual strategic + Ralph mechanical)
-   - Use for simple/mechanical modules
-   - Manual for complex/strategic work
-   - Rationale: 10x faster, 99% cheaper, maintain quality
-
-### Coaching Decisions
-
-1. **2026-01-14:** 4 coaching methodologies integrated
-   - MI (Motivational Interviewing) - 7/10 modules
-   - CBC (Cognitive Behavioral Coaching) - 8/10 modules
-   - AI (Appreciative Inquiry) - 3/10 modules
-   - SDT (Self-Determination Theory) - 3/10 modules
-   - Rationale: Evidence-based, behavioral change focus
-
-2. **2026-01-14:** Module dependency order enforced
-   - Build in dependency order, not numerical
-   - Module 01 first, Module 06 is integration point
-   - Rationale: Avoid cascading failures
-
----
-
-## Environment Status
-
-### Development
-- **Status:** ⬚ Not set up yet
-- **URL:** localhost:3000
-- **Database:** Supabase (dev project)
-- **Branch:** main
-
-### Staging
-- **Status:** ⬚ Not deployed yet
-- **URL:** TBD (Vercel preview)
-- **Database:** Supabase (staging)
-
-### Production
-- **Status:** ⬚ Not deployed yet
-- **URL:** TBD (custom domain)
-- **Database:** Supabase (production)
-
----
-
-## Team Communication
-
-### Weekly Sync Notes
-
-**Week of 2026-01-14:**
-
-**Accomplished:**
-- ✅ Completed all planning and architecture
-- ✅ Fixed all 3 critical module issues
-- ✅ Created production-ready CLAUDE.md
-- ✅ Established development strategy
-
-**Challenges:**
-- None yet (planning phase)
-
-**Next Week Focus:**
-- Phase 1: Project setup
-- Initialize Next.js project
-- Set up Supabase
-- Create database schema
+2. **Date:** [Date]  
+   **Decision:** [What was decided]  
+   **Rationale:** [Why]  
+   **Alternatives:** [What else was considered]
 
 ---
 
 ## Resource Links
 
 ### Documentation
-- [CLAUDE.md](./CLAUDE.md) - Comprehensive project guide
-- [GZ_DEVELOPMENT_STRATEGY.md](/mnt/project/GZ_DEVELOPMENT_STRATEGY.md)
-- [GZ_PRODUCT_REQUIREMENTS_DOCUMENT.md](/mnt/project/GZ_PRODUCT_REQUIREMENTS_DOCUMENT.md)
-
-### Skills (Implementation Specs)
-- Business Modules: `/mnt/project/gz-module-*.md`
-- Coaching Skills: `/mnt/project/gz-coaching-*.md`
-- Technical Skills: `/mnt/skills/user/gz-tech-*`
-
-### External Resources
-- [Anthropic Claude API](https://docs.anthropic.com)
+- [Anthropic Claude API Docs](https://docs.anthropic.com)
 - [Next.js 15 Docs](https://nextjs.org/docs)
 - [Supabase Docs](https://supabase.com/docs)
-- [Vercel Docs](https://vercel.com/docs)
-- [decimal.js Docs](https://mikemcl.github.io/decimal.js/)
+
+### Project Files
+- Skills: `/mnt/skills/user/gz-*`
+- Architecture: `CLAUDE.md`, `PLAN.md`, `SCRATCHPAD.md`
+
+### External
+- [Figma Designs (if any)]
+- [GitHub Issues]
+- [Deployment URLs]
 
 ---
 
-## Notes
+## Team Communication
 
-### Implementation Strategy
-
-**Approach:** Hybrid (Manual + Ralph)
-- **Manual:** Architecture, complex modules, strategic decisions
-- **Ralph:** Simple modules, mechanical work, testing
-
-**Development Time:**
-- Traditional: 3-6 months
-- With Ralph: 30 days
-- Savings: 80-90%
-
-**Development Cost:**
-- Traditional contractor: $50,000-100,000
-- With Ralph: $450-650
-- Savings: 99%+
-
-### Success Criteria
-
-**MVP Launch Criteria:**
-- [ ] All 10 modules functional
-- [ ] Financial calculations accurate (decimal.js)
-- [ ] DSGVO compliant (ZDR header, Frankfurt hosting)
-- [ ] WCAG 2.2 AA accessible
-- [ ] BA approval rate >90% (validate with test plans)
-- [ ] Document export working (.docx format)
+### Weekly Sync Notes
+**Week of [Date]:**
+- **Accomplished:** [Bullet points]
+- **Challenges:** [Bullet points]
+- **Next Week Focus:** [Bullet points]
 
 ---
 
-**Last Updated:** 2026-01-14  
-**Next Review:** After Phase 1 completion  
-**Owner:** Sasa (Solo Developer)
+## Risk Register
+
+### Active Risks
+1. **Risk:** [Description]
+   - **Probability:** High/Medium/Low
+   - **Impact:** High/Medium/Low
+   - **Mitigation:** [Plan]
 
 ---
 
-**💡 Tip:** Update this file after completing each phase or major milestone. Keep it current as your single source of truth for project status.
+## Environment Status
+
+### Development
+- **Status:** ✅ Running
+- **URL:** localhost:3000
+- **Database:** Supabase (dev)
+
+### Staging
+- **Status:** ⬚ Not deployed yet
+- **URL:** TBD
+- **Database:** Supabase (staging)
+
+### Production
+- **Status:** ⬚ Not deployed yet
+- **URL:** TBD
+- **Database:** Supabase (production)
+
+---
+
+**Tip:** Update this file after completing each major milestone or at end of each work session.

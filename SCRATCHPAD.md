@@ -1,258 +1,125 @@
-# Scratchpad - Current Session Notes
+# Development Scratchpad
+
+**Purpose:** Track current work state, decisions, and blockers. Updated throughout sessions.
+
+---
+
+## Current Session
 
 **Date:** 2026-01-14  
-**Time:** 12:00 (Start of Implementation Phase)  
-**Session Type:** Foundation Work  
-**Context Window:** Fresh session
+**Goal:** Complete Next.js foundation setup (Steps 10-12)  
+**Module/Feature:** Project initialization and Canvas Pattern UI foundation
 
 ---
 
-## Current Status
+## Active Work
 
-**Phase:** Phase 0 Complete ✅ → Starting Phase 1  
-**Focus:** Project initialization and setup  
-**Branch:** main  
-**Last Commit:** Initial documentation setup
+### What I'm Doing Now
+- [x] Step 10: Created foundation files (.gitignore, package.json, tsconfig.json, etc.)
+- [x] Step 11: Created folder structure (src/app, src/components, src/lib, etc.)
+- [x] Step 12: Created Next.js configuration files and Canvas Pattern UI
+- [x] Resolved dependency conflicts (vaul with React 19)
+- [x] Dev server running successfully at localhost:3000
+- [ ] Ready for Step 13: Supabase setup
 
----
+### Decisions Made Today
+1. **Decision:** Removed experimental PPR from next.config.ts  
+   **Why:** Only available in canary, caused build error  
+   **Alternatives Considered:** Upgrading to canary (decided against for stability)
 
-## Today's Goals
+2. **Decision:** Used `--legacy-peer-deps` for npm install  
+   **Why:** vaul package doesn't declare React 19 support yet, but works fine  
+   **Alternatives Considered:** Removing vaul (kept for future drawer components)
 
-### Primary Goal
-- [ ] Initialize Next.js 15 project with TypeScript
-- [ ] Configure Tailwind CSS + shadcn/ui
-- [ ] Set up Supabase project (Frankfurt region)
-
-### Secondary Goals
-- [ ] Create initial database schema
-- [ ] Set up environment variables
-- [ ] Configure Git properly (.gitignore, .env.local)
-
-### Stretch Goals
-- [ ] Implement basic app layout
-- [ ] Set up Google OAuth (if time permits)
+3. **Decision:** Kept Canvas Pattern split-view layout in initial setup  
+   **Why:** Core to UX architecture, easier to build on foundation than retrofit  
+   **Alternatives Considered:** Starting with simple single-page layout
 
 ---
 
-## Session Context
+## Blockers & Open Questions
 
-### What We Just Completed
+### Blockers
+1. **Issue:** [What's stopping progress?]  
+   **Context:** [Why does this matter?]  
+   **Potential Solutions:** [Ideas to unblock]
 
-**Documentation Phase (Complete):**
-1. ✅ Fixed Module 01 (Intake) - Added complete Coaching Integration
-2. ✅ Fixed Module 05 (Marketing) - Expanded full Conversation Flow
-3. ✅ Fixed Module 06 (Finanzplanung) - YAML header + Coaching patterns
-4. ✅ Generated production-ready CLAUDE.md (38KB)
-5. ✅ Created PROGRESS.md for project tracking
-6. ✅ Created this SCRATCHPAD.md for session notes
-
-**Current State:**
-- All planning complete
-- All module specs finalized
-- Documentation foundation in place
-- Ready to start implementation
-
-### Files in Project Root
-
-```
-C:\Users\Lenovo\Documents\gz-businessplan-generator\
-├── CLAUDE.md ✅ (production guide)
-├── PROGRESS.md ✅ (project tracking)
-├── SCRATCHPAD.md ✅ (this file)
-├── README.md ⬚ (to be created)
-└── .gitignore ⬚ (empty, needs content)
-```
+### Questions Needing Answers
+1. **Question:** [What's unclear?]  
+   **Impact:** [Why does this matter?]  
+   **Source to Check:** [Who/what can answer this?]
 
 ---
 
-## Current Work
+## Recent Changes
 
-### Not Started Yet
+### Last 8 Files Created
+1. **next.config.ts** - Next.js config with security headers, webpack optimization
+2. **tailwind.config.ts** - Tailwind with shadcn/ui colors, dark mode, Canvas utilities
+3. **postcss.config.mjs** - PostCSS with Tailwind and Autoprefixer
+4. **src/app/globals.css** - Global styles with Canvas Pattern utilities, scrollbar styling
+5. **src/app/layout.tsx** - Root layout with Inter font, German locale, SEO metadata
+6. **src/app/page.tsx** - Home page with Canvas Pattern placeholder (chat + preview)
+7. **src/middleware.ts** - Supabase SSR auth middleware for protected routes
+8. **package-lock.json** - Generated after dependency installation
 
-**Next Steps:**
-1. Populate README.md with public project description
-2. Initialize Next.js 15 project
-3. Install dependencies
-4. Configure TypeScript strict mode
-
-**Waiting On:**
-- Nothing (ready to proceed)
-
-**Blockers:**
-- None
-
----
-
-## Important Reminders
-
-### Critical Rules (Review Before Coding)
-
-1. **Financial Math:** ALWAYS use decimal.js, NEVER JavaScript numbers
-2. **DSGVO:** Include `'anthropic-beta': 'zdr-2024-10-22'` header in ALL Claude API calls
-3. **Security:** Use Supabase anon key (NOT service role) on client side
-4. **Accessibility:** Every button needs `aria-label`, keyboard navigation required
-5. **Type Safety:** TypeScript strict mode, no `any` types allowed
-
-### Reference Files
-
-**Before starting implementation, read:**
-- [x] CLAUDE.md (this session)
-- [ ] GZ_DEVELOPMENT_STRATEGY.md (next - for detailed approach)
-- [ ] GZ_PRODUCT_REQUIREMENTS_DOCUMENT.md (reference when needed)
-- [ ] Relevant module skill files (as needed during implementation)
+### Files Modified Today
+- `package.json` - Already existed (Step 10)
+- All configuration files created fresh in Step 12
 
 ---
 
-## Decision Points
+## Next Steps
 
-### Decisions Made This Session
+### Immediate (This Session)
+1. ✅ Update SCRATCHPAD.md with current work
+2. ✅ Update PROGRESS.md marking Step 12 complete
+3. Git commit and push foundation files
+4. Decide: Supabase Cloud vs Local setup
 
-1. **CLAUDE.md Structure:** Comprehensive 31-page guide
-   - Why: Single source of truth, easy onboarding
-   - Impact: All project context in one place
-
-2. **Module Fix Priority:** Fixed 01, 05, 06 first
-   - Why: Critical modules with missing/incomplete content
-   - Impact: All modules now implementation-ready
-
-### Decisions Needed
-
-1. **Project Initialization Method:**
-   - Option A: `npx create-next-app@latest` (recommended)
-   - Option B: Manual setup
-   - Decision: TBD when starting Phase 1
-
-2. **Database Setup:**
-   - Create Supabase project now or wait until needed?
-   - Decision: TBD (can be done in parallel)
+### Next Session (Step 13)
+1. Set up Supabase (Cloud in Frankfurt region recommended)
+2. Create database schema (users, subscriptions, workshops tables)
+3. Configure authentication (Google OAuth)
+4. Update .env.local with Supabase credentials
+5. Test auth middleware and protected routes
 
 ---
 
-## Code Snippets & Notes
+## Notes & Reminders
 
-### Environment Variables Template
+### Keep in Mind
+- **Dependency Conflicts:** Using `--legacy-peer-deps` due to vaul + React 19
+- **Missing Dependencies Fixed:** @supabase/ssr, tailwindcss-animate, @tailwindcss/typography
+- **Dev Server Port:** localhost:3000 (also available at 192.168.2.205:3000 on local network)
+- **Lockfile Warning:** Harmless warning about parent directory lockfile (can fix later)
+- **DSGVO Compliance:** Supabase must use Frankfurt (eu-central-1) region
 
-```bash
-# .env.local (NEVER commit this file)
-NEXT_PUBLIC_SUPABASE_URL=https://[project].supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=[anon_key]
-SUPABASE_SERVICE_ROLE_KEY=[service_key] # Server-side only
-ANTHROPIC_API_KEY=[api_key]
-```
-
-### Initial Dependencies
-
-```json
-{
-  "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@supabase/supabase-js": "^2.39.0",
-    "@anthropic-ai/sdk": "^0.34.0",
-    "ai": "^3.0.0",
-    "jotai": "^2.6.0",
-    "decimal.js": "^10.4.3",
-    "zod": "^3.22.0",
-    "idb-keyval": "^6.2.1",
-    "nuqs": "^1.17.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.3.0",
-    "@types/node": "^20.10.0",
-    "@types/react": "^18.2.0",
-    "tailwindcss": "^3.4.0",
-    "eslint": "^8.56.0",
-    "prettier": "^3.1.0"
-  }
-}
-```
+### Reference Links
+- Canvas Pattern UI working: http://localhost:3000
+- Supabase setup: https://supabase.com
+- Next.js 15 docs: https://nextjs.org/docs
 
 ---
 
-## Questions & Answers
+## Context Summary (For Recovery After /clear)
 
-**Q: Should we use App Router or Pages Router?**  
-A: App Router (Next.js 15 default). Enables RSC, PPR, better performance.
+**Feature:** Project Foundation Setup (Steps 10-12)  
+**Current State:** Next.js 15 app running with Canvas Pattern UI, ready for Supabase integration  
+**Key Files:** 
+- `/next.config.ts` - Next.js configuration
+- `/src/app/layout.tsx` - Root layout with German locale
+- `/src/app/page.tsx` - Canvas Pattern homepage
+- `/src/middleware.ts` - Supabase auth middleware (needs .env.local vars)
 
-**Q: Where do skill files go in the actual project?**  
-A: Copy from `/mnt/project/` to `public/skills/` so they can be loaded at runtime.
-
-**Q: How to handle skill prompt loading?**  
-A: Read from `public/skills/[module].md` server-side, inject into Claude system prompt.
-
-**Q: What's the module build order?**  
-A: See PROGRESS.md Phase 4. Start with Module 01 (no deps), end with Module 10 (needs all).
-
----
-
-## Links & References
-
-### Project Files
-- [CLAUDE.md](./CLAUDE.md)
-- [PROGRESS.md](./PROGRESS.md)
-- [README.md](./README.md) (to be created)
-
-### Skills (in /mnt/project/)
-- `gz-module-01-intake-STREAMLINED.md`
-- `gz-module-02-geschaeftsmodell-STREAMLINED.md`
-- ... (all 10 modules)
-- `gz-coaching-*.md` (6 coaching skills)
-
-### External Docs
-- [Next.js 15](https://nextjs.org/docs)
-- [Supabase](https://supabase.com/docs)
-- [Claude API](https://docs.anthropic.com)
-- [decimal.js](https://mikemcl.github.io/decimal.js/)
+**Critical Context:**
+- All foundation files created and working
+- Dev server runs successfully with `npm run dev`
+- Canvas Pattern split-view visible in browser
+- Next step is Supabase setup (Step 13)
+- Using Next.js 15, React 19, TypeScript strict mode
+- Frankfurt region required for DSGVO compliance
 
 ---
 
-## Parking Lot
-
-**Ideas to explore later:**
-- Voice coaching feature (premium tier)
-- Mobile app (React Native)
-- Template marketplace (sell business plan templates)
-- Partnership with BA advisors
-
-**Technical improvements:**
-- Prompt caching optimization
-- Background sync with service workers
-- Collaborative editing (multi-user)
-
----
-
-## Session End Checklist
-
-Before ending this session:
-- [ ] Update this SCRATCHPAD.md with progress
-- [ ] Update PROGRESS.md if phase/milestone complete
-- [ ] Commit code with descriptive message
-- [ ] Note any blockers or decisions needed
-- [ ] Write "Next Steps" for next session
-
----
-
-## Next Session
-
-**When:** TBD  
-**Focus:** Phase 1 - Project Setup  
-**First Steps:**
-1. Read GZ_DEVELOPMENT_STRATEGY.md
-2. Initialize Next.js 15 project
-3. Install core dependencies
-4. Configure TypeScript strict mode
-5. Update this SCRATCHPAD.md
-
-**Context to Load:**
-- CLAUDE.md (project guide)
-- PROGRESS.md (status)
-- This SCRATCHPAD.md (session notes)
-- GZ_DEVELOPMENT_STRATEGY.md (implementation approach)
-
----
-
-**💡 Tip:** Update this file throughout your work session. Write down thoughts, decisions, and progress. It's your external memory - make it detailed!
-
-**Last Updated:** 2026-01-14 12:00  
-**Next Update:** After Phase 1 starts
+**Last Updated:** 2026-01-14 14:15 CET
