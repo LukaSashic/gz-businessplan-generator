@@ -3,242 +3,152 @@
 **Purpose:** Track current work state, decisions, and blockers. Updated throughout sessions.
 
 ---
-Current Session
-Date: 2026-01-14
-Goal: Step 13 - Supabase Cloud Setup in Frankfurt
-Module/Feature: Database Infrastructure & Authentication
-
-Active Work
-What I'm Doing Now
-
- Created comprehensive Supabase setup guide
- Execute Supabase project creation in Frankfurt
- Run database migration (complete schema)
- Configure Google OAuth
- Test authentication flow
-
-Decisions Made Today
-
-Decision: Use UUIDv7 for all primary keys
-Why: Better B-Tree index performance through time-ordering, recommended best practice for PostgreSQL 2026
-Alternatives Considered: gen_random_uuid() (deprecated), uuid_generate_v4() (standard)
-Decision: Frankfurt region for Supabase deployment
-Why: GDPR compliance requirement, data sovereignty for German users
-Alternatives Considered: US regions (not GDPR-compliant)
-Decision: Google OAuth as primary authentication method
-Why: Best UX, reduces friction, widely trusted by German users
-Alternatives Considered: Magic Link (secondary), Email+Password (optional)
-
-
-Blockers & Open Questions
-Blockers
-
-Issue: [What's stopping progress?]
-Context: [Why does this matter?]
-Potential Solutions: [Ideas to unblock]
-
-Questions Needing Answers
-
-Question: [What's unclear?]
-Impact: [Why does this matter?]
-Source to Check: [Who/what can answer this?]
-
-
-Recent Changes
-Last 3 Changes
-
-[File/Component] - [What changed] - [Why]
-[File/Component] - [What changed] - [Why]
-[File/Component] - [What changed] - [Why]
-
-Files Modified Today
-
-path/to/file1.ts - [Brief description]
-path/to/file2.tsx - [Brief description]
-
-
-Next Steps
-Immediate (This Session)
-
-Review supabase-setup-guide.md
-Create Supabase account (if not exists)
-Execute Phase 1: Project Creation in Frankfurt
-Execute Phase 2: Database Migration (run complete SQL)
-Execute Phase 3: Google OAuth setup
-
-Tomorrow (Next Session)
-
-Complete Phases 4-7: Environment setup, client files, testing
-Verify authentication flow end-to-end
-Update PROGRESS.md with completion status
-Move to Step 14: Frontend Auth UI implementation
-
-
-Notes & Reminders
-Keep in Mind
-
-[Important context that shouldn't be forgotten]
-[Gotchas or warnings for future work]
-
-Reference Links
-
-[Relevant documentation or discussion links]
-
-
-Context Summary (For Recovery After /clear)
-Feature: Supabase Cloud Setup (Step 13)
-Current State: Setup guide created, ready for manual execution
-Key Files:
-
-/home/claude/supabase-setup-guide.md - Complete implementation guide
-/mnt/skills/user/gz-tech-database/SKILL.md - Database schema reference
-.env.local - Environment variables (to be created)
-
-Critical Context:
-
-Frankfurt region REQUIRED for GDPR compliance
-UUIDv7 functions included in migration for better performance
-Complete schema with RLS policies ready to deploy
-Google OAuth requires both Google Cloud Console AND Supabase configuration
-All 12 tables + subscription_plans + audit system included
-Next session will execute the setup manually following the guide
-
-## Current Session (2026-01-14 - Ready for Supabase)
-
-**Status:** All foundation work complete, ready for Step 13: Supabase Setup
-
-**Completed Today:**
-- ✅ Complete audit of all 8 gz-tech skills
-- ✅ Updated 7 documentation lines (13→10 modules)
-- ✅ Skills uploaded to Claude.ai Project
-- ✅ Next.js 15 foundation running (localhost:3000)
-- ✅ Git committed and pushed to GitHub
-- ✅ CLAUDE.md, PROGRESS.md fully updated
-
-**Next Action:** Step 13 - Supabase Cloud Setup (Frankfurt region)
-- Create Supabase project
-- Configure database schema
-- Set up Google OAuth
-- Update .env.local with credentials
-
-**Token Status:** Starting fresh conversation for Supabase implementation
 
 ## Current Session
 
-**Date:** 2026-01-14  
-**Goal:** Complete Next.js foundation setup (Steps 10-12)  
-**Module/Feature:** Project initialization and Canvas Pattern UI foundation
+**Date:** 2026-01-15  
+**Goal:** Complete Step 14 - Frontend Auth UI  
+**Module/Feature:** Dashboard, Profile Settings, Workshop Management
 
 ---
 
 ## Active Work
 
-### What I'm Doing Now
-- [x] Step 10: Created foundation files (.gitignore, package.json, tsconfig.json, etc.)
-- [x] Step 11: Created folder structure (src/app, src/components, src/lib, etc.)
-- [x] Step 12: Created Next.js configuration files and Canvas Pattern UI
-- [x] Resolved dependency conflicts (vaul with React 19)
-- [x] Dev server running successfully at localhost:3000
-- [ ] Ready for Step 13: Supabase setup
+### What I Just Completed
+- [x] Part 1: Fixed uuid_generate_v7() encoding bug with CASCADE
+- [x] Part 2: Enhanced middleware with route protection
+- [x] Part 3: Dashboard layout with sidebar and header
+- [x] Part 4: User profile settings page with form
+- [x] Part 5: Workshop list, create, and delete functionality
+
+### Next Up
+- [ ] Part 6: Jotai state management setup
+- [ ] Install jotai, jotai-devtools, idb-keyval
+- [ ] Create atom definitions for workshop state
+- [ ] Set up persistence layer
 
 ### Decisions Made Today
-1. **Decision:** Removed experimental PPR from next.config.ts  
-   **Why:** Only available in canary, caused build error  
-   **Alternatives Considered:** Upgrading to canary (decided against for stability)
+1. **Decision:** Use CASCADE when dropping uuid_generate_v7() function  
+   **Why:** Function was used as default in 9 tables, needed to drop and recreate  
+   **Result:** Clean replacement, all defaults restored
 
-2. **Decision:** Used `--legacy-peer-deps` for npm install  
-   **Why:** vaul package doesn't declare React 19 support yet, but works fine  
-   **Alternatives Considered:** Removing vaul (kept for future drawer components)
+2. **Decision:** Add phone column to profiles table  
+   **Why:** Profile update form expected it, useful for business context  
+   **Result:** Profile editing now works completely
 
-3. **Decision:** Kept Canvas Pattern split-view layout in initial setup  
-   **Why:** Core to UX architecture, easier to build on foundation than retrofit  
-   **Alternatives Considered:** Starting with simple single-page layout
+3. **Decision:** Match workshops table schema to actual database structure  
+   **Why:** Form used business_name, current_module, data but they didn't exist  
+   **Result:** Added missing columns, workshop creation now works
+
+4. **Decision:** Use title field as primary workshop identifier  
+   **Why:** title column is NOT NULL in database, business_name is nullable  
+   **Result:** Workshop creation succeeds, proper data structure
 
 ---
 
 ## Blockers & Open Questions
 
 ### Blockers
-1. **Issue:** [What's stopping progress?]  
-   **Context:** [Why does this matter?]  
-   **Potential Solutions:** [Ideas to unblock]
+None currently - all Step 14 blockers resolved!
 
 ### Questions Needing Answers
-1. **Question:** [What's unclear?]  
-   **Impact:** [Why does this matter?]  
-   **Source to Check:** [Who/what can answer this?]
+1. **Question:** Where to implement Canvas Pattern for workshop modules?  
+   **Impact:** Need split-view chat + document preview for coaching flow  
+   **Source to Check:** gz-tech-frontend SKILL.md, implement in /workshop/[id] route
+
+2. **Question:** How to structure Jotai atoms for 10 modules?  
+   **Impact:** Need efficient state management for workshop data  
+   **Source to Check:** gz-tech-frontend SKILL.md has atom patterns
 
 ---
 
 ## Recent Changes
 
-### Last 8 Files Created
-1. **next.config.ts** - Next.js config with security headers, webpack optimization
-2. **tailwind.config.ts** - Tailwind with shadcn/ui colors, dark mode, Canvas utilities
-3. **postcss.config.mjs** - PostCSS with Tailwind and Autoprefixer
-4. **src/app/globals.css** - Global styles with Canvas Pattern utilities, scrollbar styling
-5. **src/app/layout.tsx** - Root layout with Inter font, German locale, SEO metadata
-6. **src/app/page.tsx** - Home page with Canvas Pattern placeholder (chat + preview)
-7. **src/middleware.ts** - Supabase SSR auth middleware for protected routes
-8. **package-lock.json** - Generated after dependency installation
+### Last 10 Changes
+1. `src/components/dashboard/create-workshop-form.tsx` - Workshop creation form with validation
+2. `src/components/dashboard/delete-workshop-button.tsx` - Delete workshop with confirmation
+3. `src/app/dashboard/workshops/page.tsx` - Workshop list with grid layout
+4. `src/app/dashboard/workshops/new/page.tsx` - New workshop creation page
+5. `src/components/dashboard/profile-form.tsx` - Profile edit form (name, phone)
+6. `src/app/dashboard/settings/page.tsx` - Settings page with profile management
+7. `src/components/dashboard/sidebar.tsx` - Sidebar navigation with user info
+8. `src/components/dashboard/header.tsx` - Top header for dashboard
+9. `src/app/dashboard/layout.tsx` - Dashboard layout wrapper
+10. `src/app/dashboard/page.tsx` - Main dashboard with workshop overview
 
 ### Files Modified Today
-- `package.json` - Already existed (Step 10)
-- All configuration files created fresh in Step 12
+- `middleware.ts` - Enhanced with explicit route protection lists
+- `src/lib/utils.ts` - Added cn() utility for className merging
+- `src/components/ui/button.tsx` - Button component with variants
+- Database: Added phone, business_name, current_module, data columns
+- Database: Fixed uuid_generate_v7() function
+- Database: Fixed RLS policy for profile updates
 
 ---
 
 ## Next Steps
 
-### Immediate (This Session)
-1. ✅ Update SCRATCHPAD.md with current work
-2. ✅ Update PROGRESS.md marking Step 12 complete
-3. Git commit and push foundation files
-4. Decide: Supabase Cloud vs Local setup
+### Immediate (This Session - Part 6)
+1. Install Jotai dependencies (jotai, jotai-devtools, idb-keyval)
+2. Create src/lib/state/ directory structure
+3. Define workshop atoms (workshopAtom, currentModuleAtom)
+4. Set up atom persistence with IndexedDB
+5. Create useWorkshop hook for easy access
 
-### Next Session (Step 13)
-1. Set up Supabase (Cloud in Frankfurt region recommended)
-2. Create database schema (users, subscriptions, workshops tables)
-3. Configure authentication (Google OAuth)
-4. Update .env.local with Supabase credentials
-5. Test auth middleware and protected routes
+### Tomorrow (After Step 14)
+1. Start Phase 4: Backend API Routes
+2. Implement /api/chat endpoint with Claude streaming
+3. Add Vercel AI SDK integration
+4. Set up streaming JSON extraction
+5. Test end-to-end Claude coaching flow
 
 ---
 
 ## Notes & Reminders
 
 ### Keep in Mind
-- **Dependency Conflicts:** Using `--legacy-peer-deps` due to vaul + React 19
-- **Missing Dependencies Fixed:** @supabase/ssr, tailwindcss-animate, @tailwindcss/typography
-- **Dev Server Port:** localhost:3000 (also available at 192.168.2.205:3000 on local network)
-- **Lockfile Warning:** Harmless warning about parent directory lockfile (can fix later)
-- **DSGVO Compliance:** Supabase must use Frankfurt (eu-central-1) region
+- **lib/ folder location:** lib/ is in PROJECT ROOT, not src/. Always use relative paths like '../../../lib/supabase/server'
+- **server.ts async cookies:** Use `const cookieStore = await cookies()` - it's async in Next.js 15
+- **--legacy-peer-deps:** Always use this flag for npm install due to React 19 peer dependency conflicts
+- **TypeScript server refresh:** Sometimes need to restart TS server in VS Code (Ctrl+Shift+P → "TypeScript: Restart TS Server")
+- **RLS policies:** UPDATE policies need both USING and WITH CHECK expressions with same condition
+- **Database schema:** Always check actual schema before assuming column names - use information_schema query
+
+### Gotchas Encountered
+1. **uuid_generate_v7() bug:** Original function generated invalid UUIDs - fixed with proper RFC 9562 implementation
+2. **Missing columns:** workshops table needed business_name, current_module, data columns added manually
+3. **Profile RLS policy:** Used user_id instead of id in USING clause - caused silent update failures
+4. **Phone column:** Profile form expected phone column that didn't exist - added via ALTER TABLE
+5. **Workshop title:** title field is NOT NULL, must provide it when creating workshops
 
 ### Reference Links
-- Canvas Pattern UI working: http://localhost:3000
-- Supabase setup: https://supabase.com
-- Next.js 15 docs: https://nextjs.org/docs
+- [Supabase RLS Policies](https://supabase.com/docs/guides/auth/row-level-security)
+- [Next.js 15 App Router](https://nextjs.org/docs/app)
+- [Jotai Documentation](https://jotai.org/docs/introduction)
 
 ---
 
 ## Context Summary (For Recovery After /clear)
 
-**Feature:** Project Foundation Setup (Steps 10-12)  
-**Current State:** Next.js 15 app running with Canvas Pattern UI, ready for Supabase integration  
-**Key Files:** 
-- `/next.config.ts` - Next.js configuration
-- `/src/app/layout.tsx` - Root layout with German locale
-- `/src/app/page.tsx` - Canvas Pattern homepage
-- `/src/middleware.ts` - Supabase auth middleware (needs .env.local vars)
+**Feature:** Frontend Authentication UI - Dashboard, Profile, Workshop Management  
+**Current State:** Step 14 Parts 1-5 complete, starting Part 6 (Jotai state management)  
+**Key Files:**
+- `src/app/dashboard/layout.tsx` - Main dashboard layout with sidebar
+- `src/app/dashboard/page.tsx` - Dashboard overview with workshops
+- `src/app/dashboard/settings/page.tsx` - User profile settings
+- `src/app/dashboard/workshops/page.tsx` - Workshop list view
+- `src/components/dashboard/*` - Sidebar, header, forms, buttons
+- `middleware.ts` - Enhanced route protection
+- Database: profiles (with phone), workshops (title, business_name, current_module, data)
 
 **Critical Context:**
-- All foundation files created and working
-- Dev server runs successfully with `npm run dev`
-- Canvas Pattern split-view visible in browser
-- Next step is Supabase setup (Step 13)
-- Using Next.js 15, React 19, TypeScript strict mode
-- Frankfurt region required for DSGVO compliance
+- All authentication flows working (Google OAuth)
+- Dashboard fully functional with sidebar navigation
+- Profile editing works (name, phone)
+- Workshop CRUD operations complete (create, list, delete)
+- Ready for state management layer with Jotai
+- Next: Implement atoms for workshop state, then move to backend API routes
 
 ---
 
-**Last Updated:** 2026-01-14 14:15 CET
+**Last Updated:** 2026-01-15 14:00

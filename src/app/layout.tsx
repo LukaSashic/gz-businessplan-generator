@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { JotaiProvider } from '@/components/providers/jotai-provider';
+import { Toaster } from '@/components/ui/toast';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -60,8 +62,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://api.anthropic.com" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {/* Theme provider will be added here */}
-        {children}
+        <JotaiProvider>
+          {children}
+          <Toaster />
+        </JotaiProvider>
       </body>
     </html>
   );

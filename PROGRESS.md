@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
 **Project:** GZ Businessplan Generator  
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-15
 
 ---
 
@@ -12,16 +12,16 @@
 🎯 PROJECT PHASES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Phase 1: Architecture & Skills Definition
-✅ Phase 2: Database Schema & RLS Policies  
-🔄 Phase 3: Frontend Foundation (IN PROGRESS - 60%)
+✅ Phase 2: Database Schema & RLS Policies
+✅ Phase 3: Frontend Foundation (COMPLETE)
 ⬚ Phase 4: Backend API Routes
 ⬚ Phase 5: Claude Integration
-⬚ Phase 6: Module Implementation (13 modules)
+⬚ Phase 6: Module Implementation (10 modules)
 ⬚ Phase 7: Document Generation
 ⬚ Phase 8: Testing & Accessibility
 ⬚ Phase 9: Deployment & Monitoring
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Progress: 2.6/9 Phases (29%)
+Progress: 3/9 Phases (33%)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -29,65 +29,53 @@ Progress: 2.6/9 Phases (29%)
 
 ## Completed Features
 
-### ✅ Database & Auth (Phase 2)
+### ✅ Database & Auth
 - [x] Supabase project setup (Frankfurt region)
 - [x] User authentication with Google OAuth
 - [x] Workshop, modules, conversations tables
 - [x] RLS policies for data isolation
 - [x] Database migrations system
+- [x] Fixed uuid_generate_v7() function (RFC 9562 compliant)
+- [x] Profile table with phone column
+- [x] Workshops table schema (title, business_name, current_module, data)
 
-### ✅ Skills Definition (Phase 1)
+### ✅ Skills Definition
 - [x] gz-orchestrator (master controller)
-- [x] All 13 module skills (intake → zusammenfassung)
+- [x] All 10 module skills (intake → zusammenfassung)
 - [x] gz-tech-architecture (system design)
 - [x] gz-tech-frontend (UI patterns)
 - [x] gz-tech-backend (API implementation)
 - [x] gz-tech-database (schema & RLS)
 
-### ✅ Next.js Foundation Setup (Phase 3 - Initial)
-- [x] Project initialization with Next.js 15 + React 19
+### ✅ Frontend Foundation
+- [x] Next.js 15 project initialization
+- [x] Tailwind CSS + shadcn/ui setup
 - [x] TypeScript strict mode configuration
-- [x] Tailwind CSS + shadcn/ui setup (dark mode, animations)
-- [x] Canvas Pattern UI foundation (split-view layout)
-- [x] Supabase SSR auth middleware
-- [x] Security headers configuration
-- [x] Dependency resolution (vaul + React 19)
-- [x] Dev server running successfully
+- [x] Enhanced middleware with route protection
+- [x] Dashboard layout with sidebar navigation
+- [x] User profile settings page (edit name, phone)
+- [x] Workshop management (list, create, delete)
+- [x] Button component with variants
+- [x] Utility functions (cn for className merging)
 
 ---
 
 ## In Progress
 
-### 🔄 Frontend Foundation (Phase 3 - 60% Complete)
-**Current Focus:** Supabase integration and state management
+### 🔄 State Management Setup
+**Current Focus:** Jotai atoms for global state
 
-**Completed:**
-- [x] Next.js 15 project initialization (Step 10-12)
-- [x] Tailwind CSS + shadcn/ui setup (Step 12)
-- [x] TypeScript strict mode configuration (Step 10)
-- [x] Canvas Pattern UI placeholder (Step 12)
-- [x] Folder structure (/src/app, /src/components, /src/lib)
+**Next Steps:**
+1. Install Jotai and related dependencies
+2. Create atom definitions for workshop state
+3. Set up user preferences atoms
+4. Add IndexedDB persistence layer
+5. Implement URL state with nuqs
 
-**Next (Step 13-15):**
-- [ ] Supabase Cloud setup (Frankfurt region)
-- [ ] Create .env.local with API keys
-- [ ] Test authentication flow
-- [ ] Verify middleware protection
-
-**After Supabase (Step 16-20):**
-- [ ] Jotai atoms for state management
-- [ ] IndexedDB persistence layer
-- [ ] URL state with nuqs
-- [ ] Canvas layout with resize handle
-
-**Blocked:**
-- [ ] Streaming extraction (needs backend /api/chat first)
-
-**Timeline:**
-- Steps 10-12 (Foundation): ✅ Complete (Jan 14)
-- Steps 13-15 (Supabase): 🔄 Next (Jan 14)
-- Steps 16-20 (State/UI): ⬚ After Supabase
-- Steps 21-25 (Integration): ⬚ Final phase
+**After State Management:**
+- Backend API routes for Claude integration
+- Streaming JSON extraction
+- Workshop module implementation
 
 ---
 
@@ -172,15 +160,36 @@ Individual module workflows (coaching + validation):
 ## Decisions Log
 
 ### Recent Decisions
-1. **Date:** 2026-01-12  
+
+1. **Date:** 2026-01-15  
+   **Decision:** Fix uuid_generate_v7() with proper RFC 9562 implementation  
+   **Rationale:** Original function generated invalid UUIDs causing profile creation failures  
+   **Impact:** Automatic profile creation now works, UUIDs properly sortable by timestamp
+
+2. **Date:** 2026-01-15  
+   **Decision:** Use relative imports for lib/ directory  
+   **Rationale:** lib/ is in project root, not src/ - requires '../../../lib/supabase/server' syntax  
+   **Impact:** Proper module resolution, no TypeScript errors
+
+3. **Date:** 2026-01-15  
+   **Decision:** Add phone column to profiles table  
+   **Rationale:** Needed for complete user profiles in business plan context  
+   **Impact:** Users can now store contact information
+
+4. **Date:** 2026-01-15  
+   **Decision:** Fix workshops table schema mismatch  
+   **Rationale:** Form expected business_name, current_module, data columns that didn't exist  
+   **Impact:** Workshop creation now works, proper data structure for module progress
+
+5. **Date:** 2026-01-12  
    **Decision:** Use Jotai instead of Redux  
    **Rationale:** Atomic state, better performance, smaller bundle  
-   **Alternatives:** Redux Toolkit, Zustand  
+   **Alternatives:** Redux Toolkit, Zustand
 
-2. **Date:** [Date]  
-   **Decision:** [What was decided]  
-   **Rationale:** [Why]  
-   **Alternatives:** [What else was considered]
+6. **Date:** 2026-01-12  
+   **Decision:** Use --legacy-peer-deps for React 19 compatibility  
+   **Rationale:** Some packages don't yet declare React 19 support  
+   **Impact:** Allows installation of necessary dependencies
 
 ---
 
