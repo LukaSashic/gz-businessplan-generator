@@ -55,7 +55,7 @@ export default async function DashboardPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">
-                      {workshop.business_name || 'Unbenannt'}
+                      {workshop.title || workshop.business_name || 'Unbenannt'}
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
                       Erstellt am{' '}
