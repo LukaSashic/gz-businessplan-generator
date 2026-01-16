@@ -1,405 +1,169 @@
 # Development Scratchpad
 
-**Last Updated**: 2025-01-15  
-**Current Phase**: Phase 4 Complete → Ready for Phase 5
+**Last Updated**: 2026-01-16
+**Current Phase**: Phase 5 COMPLETE → Ready for Phase 6
 
 ---
 
-## 🎉 Phase 4 Complete! (Jan 15, 2025)
+## 🎉 Phase 5 Complete! (Jan 16, 2026)
 
 ### Session Summary
 
-**Time**: 4-5 hours  
-**Result**: ✅ 90% test pass rate  
-**LOC**: ~2,000 lines  
-**Files**: 11 new files  
+**Time**: ~2 hours
+**Result**: ✅ Phase 5 100% complete
+**Features Added**: Auto-save, keyboard shortcuts, saving indicator
 
-### What We Built
+### What We Built Today
 
-**1. Claude API Streaming** (`/api/chat`)
-- Server-Sent Events streaming
-- Zero Data Retention header (GDPR)
-- Fallback system prompts for MVP
-- Retry logic with exponential backoff
-- Rate limiting (10 req/min)
+**1. Auto-Save System**
+- `useAutoSave` hook in `src/lib/state/hooks.ts`
+- Saves to IndexedDB every 5 seconds when data changes
+- Loads data on component mount
+- Saves on unmount for unsaved changes
+- Uses existing `persistence.ts` infrastructure
 
-**2. Workshop CRUD APIs** (8 endpoints)
-- Create, list, get, update, delete workshops
-- Save/get module progress  
-- JSONB data merging
-- Next.js 15 async params support
+**2. Saving Indicator**
+- Shows spinner + "Speichert..." while saving
+- Shows cloud icon + "Gerade gespeichert" / "Vor Xs gespeichert" after save
+- Integrated into `WorkshopHeader` component
 
-**3. Streaming JSON Parser**
-- Extracts structured data during streaming
-- Uses partial-json for incomplete JSON
-- React hook for easy integration
+**3. Keyboard Shortcuts**
+- Enter → Send message
+- Cmd/Ctrl+Enter → Send message (alternative)
+- Escape → Clear input and blur
 
-**4. Rate Limiting System**
-- Reusable RateLimiter class
-- In-memory storage with cleanup
-- Standard HTTP headers
-- Helpful 429 errors
-
-**5. Developer Tools**
-- Zod schemas for all 10 modules
-- Integration test suite
-- TypeScript types throughout
-
-### Integration Test Results
-
-```
-🎯 9/10 Tests Passed (90%)
-
-✅ Workshop CREATE
-✅ Workshop UPDATE
-✅ Module Progress
-✅ Workshop DELETE
-✅ Rate Limit Headers
-✅ Claude Streaming  
-✅ Stream Content
-✅ 404 Handling
-✅ 400 Handling
-⚠️  Rate Limiting (works correctly)
-```
-
-### Technical Challenges Solved
-
-1. **Next.js 15 Async Params**
-   - Problem: `params.id` throws error
-   - Solution: `await params` then destructure
-   - Impact: All routes now compatible
-
-2. **Database Status Constraint**
-   - Problem: DB uses `in_progress`, code used `in-progress`
-   - Solution: Fixed validation array
-   - Impact: PATCH requests work
-
-3. **Windows Paths**
-   - Problem: `/mnt/skills/` doesn't exist on Windows
-   - Solution: Fallback prompts in code
-   - Impact: Claude API works immediately
-
-4. **Rate Limit Testing**
-   - Problem: Expected 10 success, 1 block
-   - Solution: Counter includes previous requests
-   - Impact: Rate limiter working correctly ✅
-
-### Cost Analysis
-
-**This Session**:
-- Time: 4-5 hours
-- API calls: ~$0.50
-- Total: ~$0.50
-
-**Traditional Development**:
-- Rate: $100/hour
-- Time: 40 hours
-- Total: $4,000
-
-**Savings: 99.9%** 🚀
+**4. Bug Fixes (from earlier)**
+- Routing: `/workshop/${id}` → `/dashboard/workshop/${id}`
+- Supabase client → server import for Server Component
+- Jotai "not writable atom" → use `workshopsAtom` instead
 
 ---
 
-## 📝 Notes for Phase 5
+## 📊 Phase 5 Final Status: 100% Complete
 
-### What to Build: Workshop Canvas UI
+### All Features Implemented ✅
 
-**Canvas Pattern** (like Claude.ai):
-```
-┌─────────────────────────────────────────┐
-│  Header: Workshop Name, Status          │
-├──────────────┬──────────────────────────┤
-│              │                          │
-│  Chat        │  Document Preview        │
-│  Interface   │                          │
-│              │  - Live updates          │
-│  - Messages  │  - Markdown rendering    │
-│  - Input     │  - Scroll sync           │
-│  - Streaming │                          │
-│              │                          │
-├──────────────┴──────────────────────────┤
-│  Module Navigation (optional sidebar)   │
-└─────────────────────────────────────────┘
-```
-
-**Components to Create**:
-1. `workshop-canvas.tsx` - Main split-view container
-2. `chat-panel.tsx` - Left side chat interface  
-3. `preview-panel.tsx` - Right side document
-4. `message-list.tsx` - Message history
-5. `message-input.tsx` - Chat input field
-6. `document-preview.tsx` - Markdown renderer
-7. `module-nav.tsx` - Module sidebar (optional)
-
-**Estimated**: 4-6 hours, ~1,500 lines
-
-### Technical Plan
-
-**State Management**:
-- Current workshop → Jotai atom
-- Messages → `useChatStream` hook
-- Document data → Jotai atom  
-- Auto-save → IndexedDB (every 5s)
-
-**Streaming UX**:
-- Typing indicator during streaming
-- Disable input while streaming
-- Animate text word-by-word
-- Cancel button for long responses
-
-**Document Preview**:
-- Use `react-markdown`
-- Syntax highlighting for code
-- Custom components for headers
-- Auto-scroll to updated sections
-
-**Responsive Design**:
-- Desktop: Side-by-side (40/60)
-- Tablet: Collapsible panels
-- Mobile: Bottom tabs (chat/preview)
-
-### Dependencies to Install
-
-```bash
-npm install react-markdown remark-gfm rehype-highlight --legacy-peer-deps
-```
-
-- `react-markdown` - Markdown rendering
-- `remark-gfm` - GitHub Flavored Markdown  
-- `rehype-highlight` - Syntax highlighting
-
-### Pre-Session Checklist
-
-- [x] Commit Phase 4 work
-- [x] Update PROGRESS.md
-- [x] Update SCRATCHPAD.md
-- [x] Push to GitHub
-- [ ] Review Canvas Pattern reference
-- [ ] Check Jotai atoms docs
-- [ ] Review `useChatStream` API
-- [ ] Rest! 😊
+| Feature | Status | File |
+|---------|--------|------|
+| Split-view canvas | ✅ | `workshop-canvas.tsx` |
+| Chat panel | ✅ | `chat-panel.tsx` |
+| Preview panel | ✅ | `preview-panel.tsx` |
+| Message streaming | ✅ | `useChatStream` hook |
+| Module navigation | ✅ | `workshop-header.tsx` |
+| Mobile responsive | ✅ | Tabs on mobile |
+| Auto-save | ✅ | `useAutoSave` hook |
+| IndexedDB persistence | ✅ | `persistence.ts` |
+| Saving indicator | ✅ | Header component |
+| Keyboard shortcuts | ✅ | `message-input.tsx` |
 
 ---
 
-## 🐛 Known Issues & Tech Debt
+## 📁 Files Modified Today
 
-### Production TODOs (Not Blocking)
+```
+src/lib/state/hooks.ts
+  - Added useAutoSave hook (80 lines)
+  - Added useRef, useEffect imports
 
-1. **Replace in-memory rate limiter with Redis**
-   - Priority: Medium
-   - When: Multi-server deployment
+src/app/dashboard/workshop/[id]/components/workshop-canvas.tsx
+  - Integrated useAutoSave hook
+  - Pass isSaving/lastSaved to header
+  - Pass updateData to chat panel
 
-2. **Load actual skill files**
-   - Priority: High  
-   - When: Before production
-   - Currently: Using fallback prompts
+src/app/dashboard/workshop/[id]/components/workshop-header.tsx
+  - Added isSaving, lastSaved props
+  - Added formatLastSaved function
+  - Added saving indicator UI (Loader2, Cloud icons)
 
-3. **Add retry queue for failed API calls**
-   - Priority: Low
-   - Currently: Retry 2x then fail
+src/app/dashboard/workshop/[id]/components/chat-panel.tsx
+  - Added onDataUpdate prop
+  - Call onDataUpdate on message complete
 
-4. **Add request telemetry**
-   - Priority: Medium
-   - Tool: Sentry or similar
-
-### No Blockers! 🎉
-
-Everything works and is ready for Phase 5.
+src/app/dashboard/workshop/[id]/components/message-input.tsx
+  - Enhanced keyboard shortcuts
+  - Cmd/Ctrl+Enter to send
+  - Escape to clear
+```
 
 ---
 
 ## 🎓 Learnings
 
-### What Worked Well
-
-1. **Browser Console Testing**
-   - Faster than Postman
-   - Already authenticated
-   - Easy to iterate
-   - Perfect for integration tests
-
-2. **Fallback Prompts**
-   - Unblocked development
-   - Easy to test Claude
-   - Can replace later
-   - MVP-first validated
-
-3. **Incremental Testing**
-   - Test immediately after creation
-   - Catch issues early  
-   - Build confidence
-   - Reduce debugging time
-
-4. **TypeScript-First**
-   - Zod catches runtime errors
-   - Type safety across boundaries
-   - Better autocomplete
-   - Fewer production bugs
-
-### Patterns to Reuse
-
-**Rate Limiting**:
+### Auto-Save Pattern
 ```typescript
-// 1. Check limit first
-const result = rateLimiter.check(userId);
-if (!result.success) {
-  return error429(result);
-}
+export function useAutoSave(workshopId: string, interval = 5000) {
+  const previousDataRef = useRef<string>('');
 
-// 2. Process request
-// 3. Return with headers
-```
+  useEffect(() => {
+    const saveInterval = setInterval(() => {
+      const currentDataString = JSON.stringify(data);
+      if (currentDataString !== previousDataRef.current) {
+        saveData(data);
+        previousDataRef.current = currentDataString;
+      }
+    }, interval);
 
-**Streaming**:
-```typescript
-// 1. Create stream
-const stream = await anthropic.messages.stream({...});
-
-// 2. Wrap in ReadableStream
-const readableStream = new ReadableStream({
-  async start(controller) {
-    for await (const chunk of stream) {
-      controller.enqueue(encode(chunk));
-    }
-  }
-});
-
-// 3. Return with headers
-```
-
-**Error Handling**:
-```typescript
-try {
-  // Authenticate
-  const { user } = await supabase.auth.getUser();
-  if (!user) return 401;
-  
-  // Validate
-  if (!required) return 400;
-  
-  // Process
-  const result = await doSomething();
-  
-  // Return
-  return 200;
-} catch (error) {
-  return 500;
+    return () => clearInterval(saveInterval);
+  }, [data, saveData, interval]);
 }
 ```
 
----
-
-## 💡 Ideas for Future
-
-### Premium Features
-- Voice coaching (€299/month)
-- Team collaboration
-- Advanced analytics
-- AI improvements
-
-### Technical Improvements
-- Edge caching
-- Service worker (offline mode)
-- Bundle size optimization
-- Lazy load modules
-
-### DevEx Improvements
-- Storybook for all components
-- Playwright E2E tests  
-- CI/CD with GitHub Actions
-- Automated deployment previews
+### Key Patterns Used
+1. **Refs for comparing data** - Store previous state as string to detect changes
+2. **Interval + cleanup** - setInterval with clearInterval in cleanup
+3. **Save on unmount** - useEffect return for final save
+4. **Conditional saving** - Only save if data actually changed
 
 ---
 
-## 📊 Success Metrics
+## 🚀 Ready for Phase 6: Module Implementation
 
-### Phase 4 Objectives: ✅ ALL MET
+### What's Next
 
-- [x] Claude API integration
-- [x] Streaming responses
-- [x] Workshop CRUD
-- [x] Rate limiting
-- [x] Error handling
-- [x] Tests passing (90%+)
-- [x] GDPR compliant
-- [x] Production-ready code
+**Phase 6** involves implementing the 10 workshop modules:
 
-### Overall Progress
+1. **Module 01: Intake** - Founder profile, business validation
+2. **Module 02: Geschäftsmodell** - Value proposition, USP
+3. **Module 03: Unternehmen** - Legal form, insurance
+4. **Module 04: Markt & Wettbewerb** - Market analysis
+5. **Module 05: Marketing** - 4Ps, acquisition funnel
+6. **Module 06: Finanzplanung** - 3-year financials (CRITICAL)
+7. **Module 07: SWOT** - Strengths/weaknesses analysis
+8. **Module 08: Meilensteine** - 90-day plan, roadmap
+9. **Module 09: KPIs** - Key performance indicators
+10. **Module 10: Zusammenfassung** - Executive summary
 
-**Completed**: 4/9 phases (44%)  
-**On Schedule**: Yes! 🎉  
-**Quality**: High  
-**Technical Debt**: Low  
+### Technical Requirements for Phase 6
 
----
-
-## 📞 Quick Commands
-
-```bash
-# Development
-npm run dev                  # Start server
-npm run build               # Build for production
-
-# Testing  
-npx tsx test-*.ts           # Run test scripts
-
-# Git
-git add .                   # Stage all
-git commit -m "..."         # Commit
-git push                    # Push to GitHub
-
-# Database
-# Use Supabase dashboard
-```
+- Load skill files into system prompts
+- Parse structured JSON from Claude responses
+- Store module data in JSONB columns
+- Display structured data in preview panel
+- Cross-module data validation
+- **CRITICAL**: Use `decimal.js` for all financial calculations
 
 ---
 
-## 🎊 Celebration!
+## 📊 Project Status
 
-**Phase 4 was AMAZING!**
-
-- 8 API endpoints in one session ✅
-- 90% test pass rate first try ✅
-- Zero critical bugs ✅
-- Production-ready code ✅
-- Rate limiting perfect ✅
-- Streaming flawless ✅
-
-**Traditional development**: 2-3 weeks  
-**AI-assisted development**: 4-5 hours  
-
-**This is the power of AI! 🚀**
-
----
-
-## 📚 Resources for Phase 5
-
-**Canvas Examples**:
-- Claude.ai chat interface
-- Notion (document + sidebar)
-- VS Code (editor + preview)
-
-**React Markdown**:
-- https://github.com/remarkjs/react-markdown
-- https://github.com/remarkjs/remark-gfm
-- https://github.com/rehypejs/rehype-highlight
-
-**Streaming UX**:
-- Typewriter animations
-- Auto-scroll patterns
-- Loading states
+| Metric | Value |
+|--------|-------|
+| Phases Complete | 5/9 (55%) |
+| Phase 5 Progress | 100% ✅ |
+| Dev Server | Running on :3000 |
+| Next Phase | Module Implementation |
 
 ---
 
 ## 🗓️ Session Log
 
-**Date**: 2025-01-15  
-**Duration**: 4-5 hours  
-**Phase**: 4 (Backend API)  
-**Result**: ✅ Complete (90%)  
-**Next**: Phase 5 (Canvas UI)  
+**Date**: 2026-01-16
+**Duration**: ~2 hours
+**Phase**: 5 (Canvas UI)
+**Result**: ✅ Complete (100%)
+**Next**: Phase 6 (Module Implementation)
 **Status**: Ready! 🚀
 
 ---
 
-*Phase 4 COMPLETE! Taking a well-deserved break before Phase 5!* 😊
+*Phase 5 COMPLETE! Ready for Phase 6 - Module Implementation!*

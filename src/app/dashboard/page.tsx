@@ -49,7 +49,7 @@ export default async function DashboardPage() {
             {workshops.map((workshop) => (
               <Link
                 key={workshop.id}
-                href={`/workshop/${workshop.id}`}
+                href={`/dashboard/workshop/${workshop.id}`}
                 className="block rounded-lg border border-gray-200 bg-white p-6 transition-all hover:border-blue-500 hover:shadow-md"
               >
                 <div className="flex items-start justify-between">

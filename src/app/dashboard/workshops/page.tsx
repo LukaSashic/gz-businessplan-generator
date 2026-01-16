@@ -42,7 +42,7 @@ export default async function WorkshopsPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {workshops.map((workshop) => (
             <div key={workshop.id} className="relative">
-              <Link href={`/workshop/${workshop.id}`}>
+              <Link href={`/dashboard/workshop/${workshop.id}`}>
                 <div className="block cursor-pointer rounded-lg border border-gray-200 bg-white p-6 transition-all hover:border-blue-500 hover:shadow-md">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

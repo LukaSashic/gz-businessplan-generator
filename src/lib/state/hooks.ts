@@ -1,7 +1,7 @@
 'use client';
 
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   currentWorkshopAtom,
   currentWorkshopIdAtom,
@@ -146,5 +146,88 @@ export function useSavingState() {
   return {
     isSaving,
     lastSaved,
+  };
+}
+
+// Hook for auto-saving workshop data
+export function useAutoSave(workshopId: string, interval = 5000) {
+  const { data, saveData, loadData } = useWorkshopData(workshopId);
+  const { isSaving, lastSaved } = useSavingState();
+  const addToast = useSetAtom(addToastAtom);
+
+  // Track if data has changed since last save
+  const previousDataRef = useRef<string>('');
+  const hasLoadedRef = useRef(false);
+
+  // Load data on mount
+  useEffect(() => {
+    if (!hasLoadedRef.current && workshopId) {
+      loadData().then(() => {
+        hasLoadedRef.current = true;
+        // Initialize previous data after loading
+        previousDataRef.current = JSON.stringify(data);
+      });
+    }
+  }, [workshopId, loadData, data]);
+
+  // Auto-save on interval when data changes
+  useEffect(() => {
+    if (!workshopId || !hasLoadedRef.current) return;
+
+    const saveInterval = setInterval(() => {
+      const currentDataString = JSON.stringify(data);
+
+      // Only save if data has changed
+      if (currentDataString !== previousDataRef.current && currentDataString !== '{}') {
+        saveData(data).then(() => {
+          previousDataRef.current = currentDataString;
+        });
+      }
+    }, interval);
+
+    return () => clearInterval(saveInterval);
+  }, [workshopId, data, saveData, interval]);
+
+  // Save on unmount if there are unsaved changes
+  useEffect(() => {
+    return () => {
+      const currentDataString = JSON.stringify(data);
+      if (currentDataString !== previousDataRef.current && currentDataString !== '{}') {
+        persistence.saveWorkshopData(workshopId, data);
+      }
+    };
+  }, [workshopId, data]);
+
+  // Manual save function
+  const save = useCallback(async () => {
+    await saveData(data);
+    previousDataRef.current = JSON.stringify(data);
+    addToast({
+      type: 'success',
+      message: 'Gespeichert',
+    });
+  }, [data, saveData, addToast]);
+
+  // Update data function (triggers auto-save on next interval)
+  const updateData = useCallback(
+    (moduleKey: string, moduleData: Record<string, any>) => {
+      saveData({
+        ...data,
+        [moduleKey]: {
+          ...(data[moduleKey] || {}),
+          ...moduleData,
+        },
+      });
+    },
+    [data, saveData]
+  );
+
+  return {
+    data,
+    updateData,
+    save,
+    isSaving,
+    lastSaved,
+    hasUnsavedChanges: JSON.stringify(data) !== previousDataRef.current,
   };
 }
