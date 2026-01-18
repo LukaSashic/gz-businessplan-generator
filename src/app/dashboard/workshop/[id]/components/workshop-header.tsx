@@ -50,7 +50,8 @@ export default function WorkshopHeader({
 }: WorkshopHeaderProps) {
   const [currentModule, setCurrentModule] = useAtom(currentModuleAtom);
   const router = useRouter();
-  const statusInfo = STATUS_LABELS[workshop.status] || STATUS_LABELS.draft;
+  const statusKey = workshop.status as keyof typeof STATUS_LABELS;
+  const statusInfo = statusKey in STATUS_LABELS ? STATUS_LABELS[statusKey] : STATUS_LABELS.draft;
 
   // Format last saved time
   const formatLastSaved = (date: Date | null | undefined) => {
@@ -82,8 +83,8 @@ export default function WorkshopHeader({
               {workshop.business_name || 'Neuer Businessplan'}
             </h1>
             <div className="mt-1 flex items-center gap-2">
-              <Badge variant={statusInfo.variant as any}>
-                {statusInfo.label}
+              <Badge variant={statusInfo!.variant as 'default' | 'secondary' | 'destructive' | 'outline'}>
+                {statusInfo!.label}
               </Badge>
               {/* Saving indicator */}
               <span className="flex items-center gap-1 text-xs text-muted-foreground">

@@ -262,6 +262,16 @@ interface UseChatStreamState {
 }
 
 /**
+ * Initial state for restoring from persistence
+ */
+interface InitialChatState {
+  messages?: ChatMessage[];
+  moduleData?: ModuleData;
+  currentIntakePhase?: IntakePhase;
+  currentGeschaeftsmodellPhase?: GeschaeftsmodellPhase;
+}
+
+/**
  * Hook return type
  */
 interface UseChatStreamReturn extends UseChatStreamState {
@@ -279,6 +289,8 @@ interface UseChatStreamReturn extends UseChatStreamState {
   // Phase management (geschaeftsmodell)
   setGeschaeftsmodellPhase: (phase: GeschaeftsmodellPhase) => void;
   getNextGeschaeftsmodellPhase: () => GeschaeftsmodellPhase | null;
+  // State restoration
+  restoreState: (state: InitialChatState) => void;
 }
 
 /**
@@ -723,6 +735,19 @@ export function useChatStream(
     setState(prev => ({ ...prev, moduleData: null }));
   }, []);
 
+  /**
+   * Restore state from persistence (messages, moduleData, phases)
+   */
+  const restoreState = useCallback((initialState: InitialChatState) => {
+    setState(prev => ({
+      ...prev,
+      messages: initialState.messages || prev.messages,
+      moduleData: initialState.moduleData ?? prev.moduleData,
+      currentIntakePhase: initialState.currentIntakePhase || prev.currentIntakePhase,
+      currentGeschaeftsmodellPhase: initialState.currentGeschaeftsmodellPhase || prev.currentGeschaeftsmodellPhase,
+    }));
+  }, []);
+
   return {
     ...state,
     sendMessage,
@@ -739,5 +764,7 @@ export function useChatStream(
     // Phase management (geschaeftsmodell)
     setGeschaeftsmodellPhase,
     getNextGeschaeftsmodellPhase,
+    // State restoration
+    restoreState,
   };
 }

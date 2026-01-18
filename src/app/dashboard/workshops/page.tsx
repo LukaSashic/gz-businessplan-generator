@@ -1,8 +1,7 @@
 import { createClient } from '../../../../lib/supabase/server';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, FileText, Trash2 } from 'lucide-react';
-import { WorkshopCard } from '@/components/dashboard/workshop-card';
+import { PlusCircle, FileText } from 'lucide-react';
 import { DeleteWorkshopButton } from '@/components/dashboard/delete-workshop-button';
 
 export default async function WorkshopsPage() {
@@ -13,7 +12,7 @@ export default async function WorkshopsPage() {
   } = await supabase.auth.getUser();
 
   // Fetch all user's workshops
-  const { data: workshops, error } = await supabase
+  const { data: workshops } = await supabase
     .from('workshops')
     .select('*')
     .eq('user_id', user!.id)
