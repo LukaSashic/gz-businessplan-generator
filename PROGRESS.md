@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
 **Project:** GZ Businessplan Generator
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-01-18 (Session 4)
 
 ---
 
@@ -16,18 +16,268 @@
 ✅ Phase 3: Frontend Foundation
 ✅ Phase 4: Backend API Routes
 ✅ Phase 5: Workshop Canvas UI (COMPLETE!)
-⬚ Phase 6: Module Implementation (10 modules)
+🔄 Phase 6: Module Implementation (2/10 - Intake + Geschäftsmodell)
 ⬚ Phase 7: Document Generation
 ⬚ Phase 8: Testing & Accessibility
 ⬚ Phase 9: Deployment & Monitoring
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Progress: 5/9 Phases (55%)
+Progress: 5.2/9 Phases (58%)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
 
 ## Recently Completed 🎉
+
+### ✅ Phase 6 Module 02: Geschäftsmodell (2026-01-18) - COMPLETE!
+
+**Phase-Locked Prompt System for Module 02:**
+
+*Gap Analysis & Planning:*
+- [x] Created `IMPLEMENTATION_GAP_ANALYSIS.md` comparing SPEC vs implementation
+- [x] Identified Module 1 at ~90% compliance, Module 2 at ~70% compliance
+- [x] Prioritized fixes: Schema → CBC Service → Phase Prompts → API Integration
+
+*Schema Fix (BA Compliance):*
+- [x] Fixed `src/types/modules/geschaeftsmodell.ts` - enforce minimum 3 competitors
+- [x] Changed `min(0)` to `min(3)` with German error message
+- [x] BA requirement now properly enforced in Zod schema
+
+*CBC Pattern Detection Service:*
+- [x] Created `src/lib/services/cbc-pattern-detector.ts`
+- [x] 5 pattern types: vague_offering, broad_target, limiting_belief, unrealistic_assumption, provider_perspective
+- [x] German trigger word detection (150+ trigger phrases)
+- [x] 5-step CBC intervention prompt generation
+- [x] Follow-up questions per pattern type
+- [x] Integration functions: `detectCBCPattern()`, `hasCBCTrigger()`, `shouldActivateCBC()`
+
+*Phase-Specific Prompts (4 phases):*
+- [x] `_common.md` - Valid phase names, scope restrictions, CBC triggers, JSON format
+- [x] `01-angebot.md` - Offering definition (~15 min)
+  - mainOffering, deliveryFormat, pricingModel, scope, oneSentencePitch
+  - CBC patterns for vague quality claims ("guter Service", "professionell")
+- [x] `02-zielgruppe.md` - Target audience definition (~20 min)
+  - Primary persona with name, demographics, psychographics
+  - Buying trigger identification
+  - Market size with TAM/SAM and sources (BA requirement)
+  - CBC patterns for broad targets ("alle", "jeder", "Unternehmen")
+- [x] `03-wertversprechen.md` - Value Proposition Canvas (~15 min)
+  - Customer jobs, pains, gains
+  - Pain relievers, gain creators
+  - Value statement from CUSTOMER perspective (not provider!)
+  - CBC patterns for provider perspective ("Ich biete...")
+- [x] `04-usp.md` - USP definition (~20 min)
+  - Minimum 3 competitors analysis (BA requirement!)
+  - USP 5-criteria test (isUnique, isRelevant, isProvable, isUnderstandable, isOneSentence)
+  - CBC patterns for non-unique USP claims
+
+*Prompt Loader Integration:*
+- [x] Added `buildGeschaeftsmodellPhasePrompt()` function
+- [x] Added `formatPreviousGeschaeftsmodellPhaseData()` for context carryover
+- [x] Added `getMinimalGeschaeftsmodellOrchestratorContext()`
+- [x] Added `getGeschaeftsmodellPhaseJSONInstructions()` with valid phase names
+- [x] Phase-specific coaching stacks (CBC-heavy for challenging vague answers)
+- [x] Intake context injection for cross-module continuity
+
+*Chat API Integration:*
+- [x] Added `geschaeftsmodellPhase` parameter to request body
+- [x] Added `previousGeschaeftsmodellData` for progressive updates
+- [x] Added `intakeContext` for cross-module data (elevator pitch, problem, solution)
+- [x] Phase-locked prompt loading for Module 02
+
+*Preview Integration:*
+- [x] Verified `GeschaeftsmodellPreview` component already exists (789 lines)
+- [x] Internal data/document view toggle
+- [x] Phase progress stepper with completion tracking
+- [x] BA compliance blockers and warnings display
+- [x] All cards: Offering, Target Audience, Value Proposition, USP, Competitive Analysis
+
+**Files Created:**
+- `IMPLEMENTATION_GAP_ANALYSIS.md` - Gap analysis document
+- `src/lib/services/cbc-pattern-detector.ts` - CBC coaching service
+- `src/lib/prompts/modules/geschaeftsmodell-phases/_common.md`
+- `src/lib/prompts/modules/geschaeftsmodell-phases/01-angebot.md`
+- `src/lib/prompts/modules/geschaeftsmodell-phases/02-zielgruppe.md`
+- `src/lib/prompts/modules/geschaeftsmodell-phases/03-wertversprechen.md`
+- `src/lib/prompts/modules/geschaeftsmodell-phases/04-usp.md`
+
+**Files Updated:**
+- `src/types/modules/geschaeftsmodell.ts` - Min 3 competitors enforcement
+- `src/lib/prompts/prompt-loader.ts` - Geschaeftsmodell phase prompt builder
+- `src/app/api/chat/route.ts` - Geschaeftsmodell phase support
+
+---
+
+### 🔄 Phase 6 Module 01: Intake (2026-01-16) - IN PROGRESS
+
+**Module 01 UX & Transition System (Jan 16, Session 3):**
+
+*Welcome & Orientation System:*
+- [x] Created `src/lib/workshop/welcome.ts` - Welcome message generator
+- [x] Created `WelcomeScreen` component with module overview and CTA
+- [x] Integrated welcome view state into chat-panel.tsx
+
+*Module Transition Framework:*
+- [x] Created `src/lib/workshop/transitions.ts` - Transition logic
+- [x] Created `ModuleTransition` component - Celebration/recap screens
+- [x] Achievement summary, data quality check, next module preview
+- [x] Progress bar with module completion percentage
+
+*Enhanced Personality Assessment (3-option format):*
+- [x] Created `src/lib/workshop/personality-assessment.ts`
+- [x] 7 scenario templates for Howard's dimensions
+- [x] A/B/C options mapping to high/medium/low scores
+- [x] Created `PersonalityScenario` component with follow-up questions
+
+*Business-Specific Scenario Generation:*
+- [x] `generatePersonalityScenario()` injects user's business context
+- [x] Scenarios adapt to business idea (e.g., "your coaching service...")
+
+*Complete Document Preview Structure:*
+- [x] Created `src/lib/businessplan/document-structure.ts`
+- [x] Created `BusinessPlanPreview` component
+- [x] Shows actual prose text, not JSON data
+- [x] Expandable sections with status indicators
+- [x] Word count and completion percentage
+
+*Personality Narrative Generator:*
+- [x] `generatePersonalityNarrative()` function
+- [x] Converts dimension scores to human-readable German text
+
+*Preview Panel Integration:*
+- [x] Added Tabs toggle (Daten / Dokument) in preview-panel.tsx
+- [x] Switches between IntakePreview (data cards) and BusinessPlanPreview (document)
+
+**Files Created:**
+- `src/lib/workshop/welcome.ts` - Welcome message generation
+- `src/lib/workshop/transitions.ts` - Module transitions
+- `src/lib/workshop/personality-assessment.ts` - 3-option scenarios
+- `src/lib/businessplan/document-structure.ts` - Document preview structure
+- `src/app/dashboard/workshop/[id]/components/welcome-screen.tsx`
+- `src/app/dashboard/workshop/[id]/components/module-transition.tsx`
+- `src/app/dashboard/workshop/[id]/components/personality-scenario.tsx`
+- `src/app/dashboard/workshop/[id]/components/previews/businessplan-preview.tsx`
+
+**Files Updated:**
+- `src/app/dashboard/workshop/[id]/components/chat-panel.tsx` - View states
+- `src/app/dashboard/workshop/[id]/components/preview-panel.tsx` - Tab toggle
+
+---
+
+**Module 01 Improvement Plan COMPLETE (Jan 16):**
+
+*Phase 1: Critical Prompt Fixes (P0):*
+- [x] Enforce ALL 7 personality dimensions (completion tracking table + blocking rule)
+- [x] Enforce business_type phase before validation (cannot skip)
+- [x] Hard block ALG validation for unemployed (exact days required, vague answers rejected)
+- [x] Added `validateFounderProfilePhase()` with blocking for missing ALG data
+
+*Phase 2: Coaching Methodology Fixes (P1):*
+- [x] Fixed coaching loading order (stage detection now in warmup, not personality)
+- [x] Added Appreciative Inquiry opening (strengths-based warmup)
+- [x] Woven stage detection into warmup phase
+
+*Phase 3: Red Flag Detection (P1):*
+- [x] Created `src/lib/services/red-flag-detector.ts` with 9 red flag patterns
+- [x] Pattern matching for: imposterSyndrome, unrealisticExpectations, insufficientCapital, externalLocusOfControl, financialAnxiety, timeScarcity, lackOfCommitment, marketBlindness, isolationTendency
+- [x] Integrated into `useChatStream` hook (detects on user messages)
+- [x] Display in intake-preview.tsx with severity badges and coaching hints
+
+*Phase 4: Living Document Preview (P2):*
+- [x] Created `intake-document-preview.tsx` with prose-style business plan view
+- [x] View toggle (Data cards / Document) in intake-preview.tsx
+- [x] Shows what BA will see in final document
+
+*Phase 5: Hide JSON from Chat (P2):*
+- [x] `stripJSONBlocks()` in message-list.tsx removes JSON from display
+- [x] JSON extraction continues in background for data updates
+
+**Phase-Locked Prompt System (Jan 16):**
+- [x] 8 phase-specific prompt files created (`src/lib/prompts/modules/intake-phases/`)
+- [x] `buildIntakePhasePrompt()` function for phase-scoped prompts (~200-350 lines vs 1100)
+- [x] Phase name enforcement in prompts (explicit valid values, DO NOT USE table)
+- [x] `PHASE_NAME_NORMALIZATION` map in hook (30+ incorrect→correct mappings)
+- [x] `isValidPhaseTransition()` client-side validation blocks invalid phase jumps
+- [x] SCOPE RESTRICTION in _common.md (prevents Module 2+ content in intake)
+- [x] PhaseIndicator component in chat-panel.tsx
+- [x] PhaseProgressStepper in intake-preview.tsx
+- [ ] **NEXT: Manual testing of improved intake flow**
+
+**Prompt Loading System:**
+- [x] `prompt-loader.ts` upgraded to load actual module files from disk
+- [x] Module file mapping (`gz-intake` → `gz-module-01-intake.md`)
+- [x] Coaching stack per module (core + stage + ai + mi fragments)
+- [x] Layered prompt building (Orchestrator → Coaching → Module)
+
+**Type System:**
+- [x] `IntakeOutput` types with Zod schema (`src/types/modules/intake.ts`)
+- [x] Howard's 7 entrepreneurial personality dimensions
+- [x] Business type classification (6 types)
+- [x] GZ eligibility checking (150+ ALG days)
+- [x] `WorkshopSession` types (`src/types/workshop-session.ts`)
+- [x] `IntakeValidation` schema (`src/types/modules/validation.ts`)
+
+**JSON Streaming:**
+- [x] `parser.ts` supports both markdown (```json) and XML (<json>) tags
+- [x] `useChatStream` hook accumulates moduleData progressively
+- [x] `mergePartialJSON` for streaming data merging
+
+**Intake Preview Component:**
+- [x] `intake-preview.tsx` specialized preview for intake data
+- [x] Progress card with completion percentage
+- [x] GZ eligibility status alert
+- [x] Founder profile card
+- [x] Business idea card with elevator pitch
+- [x] Personality dimensions visualization
+- [x] Business type classification badge
+- [x] Resources summary (capital, time, network)
+- [x] Validation summary (strengths, concerns)
+
+**State Management:**
+- [x] `streamingDataFamily` atom for per-workshop streaming data
+- [x] `currentPhaseAtom` for phase tracking
+- [x] Phase detection from AI responses (pattern matching + JSON markers)
+
+**Validation Service:**
+- [x] `intake-validator.ts` service for real-time validation
+- [x] Phase completion checkers
+- [x] GZ eligibility urgency levels
+- [x] Validation summary generator
+
+**UI Components Added:**
+- [x] Card component (shadcn/ui pattern)
+- [x] Progress component (radix-ui)
+- [x] Badge variants (success, warning)
+
+**Files Created:**
+- `src/types/modules/intake.ts` - IntakeOutput Zod schema
+- `src/types/modules/validation.ts` - Validation types & functions
+- `src/types/workshop-session.ts` - Session state types
+- `src/lib/services/intake-validator.ts` - Validation service
+- `src/app/dashboard/workshop/[id]/components/previews/intake-preview.tsx`
+- `src/components/ui/card.tsx`
+- `src/components/ui/progress.tsx`
+
+**Files Updated:**
+- `src/lib/prompts/prompt-loader.ts` - Full rewrite + `buildIntakePhasePrompt()` + phase JSON instructions
+- `src/lib/streaming/parser.ts` - Added XML tag support
+- `src/hooks/use-chat-stream.ts` - Phase tracking, normalization map, `normalizePhase()` function
+- `src/lib/state/workshop-atoms.ts` - Added streaming atoms
+- `src/app/dashboard/workshop/[id]/components/chat-panel.tsx` - PhaseIndicator component, infinite loop fix
+- `src/app/dashboard/workshop/[id]/components/preview-panel.tsx` - Module-specific rendering
+- `src/app/dashboard/workshop/[id]/components/workshop-canvas.tsx` - Pass streaming data
+
+**Phase Prompt Files Created:**
+- `src/lib/prompts/modules/intake-phases/_common.md` - Valid phase names, scope rules
+- `src/lib/prompts/modules/intake-phases/01-warmup.md` - Business idea collection
+- `src/lib/prompts/modules/intake-phases/02-founder-profile.md` - ALG status (CRITICAL)
+- `src/lib/prompts/modules/intake-phases/03-personality.md` - Howard's 7 dimensions
+- `src/lib/prompts/modules/intake-phases/04-profile-gen.md` - Synthesize profile
+- `src/lib/prompts/modules/intake-phases/05-resources.md` - Financial, time, network
+- `src/lib/prompts/modules/intake-phases/06-business-type.md` - Classification
+- `src/lib/prompts/modules/intake-phases/07-validation.md` - GZ eligibility check
+
+---
 
 ### ✅ Phase 5: Workshop Canvas UI (2026-01-16) - COMPLETE!
 
@@ -164,41 +414,59 @@ Progress: 5/9 Phases (55%)
 
 ---
 
-## Next Up: Complete Phase 5 & Start Phase 6
+## Next Up: Continue Phase 6 Module Implementation
 
-### 🎯 Phase 5 Remaining (10%)
-- [ ] Implement IndexedDB auto-save (save every 5s or on change)
-- [ ] Add keyboard shortcuts (Cmd+Enter to send, Esc to cancel)
-- [ ] Test full end-to-end flow
+### 🎯 Phase 6: Module Implementation (2/10 Complete)
+- [x] Module 01: Intake & Assessment (~90% SPEC compliant)
+- [x] Module 02: Geschäftsmodell (Phase-locked prompts + CBC coaching)
+- [ ] Module 03: Unternehmen (Rechtsform, Standort, Management)
+- [ ] Module 04: Markt & Wettbewerb (Competitive analysis deep-dive)
+- [ ] Module 05: Marketing (Channels, pricing, customer journey)
+- [ ] Module 06: Finanzplanung (CRITICAL - decimal.js for exact math)
+- [ ] Module 07: SWOT (Cross-module synthesis)
+- [ ] Module 08: Meilensteine (Timeline, milestones)
+- [ ] Module 09: KPIs (Success metrics)
+- [ ] Module 10: Zusammenfassung (Executive summary)
 
-### 🎯 Phase 6: Module Implementation
-- [ ] Module 01: Intake & Assessment
-- [ ] Module 02: Geschäftsmodell
-- [ ] Module 03: Unternehmen
-- [ ] Module 04: Markt & Wettbewerb
-- [ ] Module 05: Marketing
-- [ ] Module 06: Finanzplanung (CRITICAL - decimal.js)
-- [ ] Module 07: SWOT
-- [ ] Module 08: Meilensteine
-- [ ] Module 09: KPIs
-- [ ] Module 10: Zusammenfassung
+### 🎯 Immediate Next Steps
+1. Manual testing of Module 02 flow with geschaeftsmodell phases
+2. Verify CBC coaching triggers work correctly
+3. Test phase transitions (angebot → zielgruppe → wertversprechen → usp)
+4. Start Module 03: Unternehmen implementation
 
 ---
 
 ## In Progress
 
-*Nothing currently in progress - Phase 5 complete! Ready to start Phase 6.*
+### Phase-Locked Intake System Testing
+
+**Status:** Sanity check complete, fixes applied, ready for manual testing
+
+**What was fixed (Jan 16, Session 2):**
+1. Claude was outputting wrong phase names ("background" instead of "founder_profile")
+2. Claude was asking market analysis questions during intake (scope creep)
+3. Added explicit phase name enforcement in all 8 prompt files
+4. Added `PHASE_NAME_NORMALIZATION` map as safety net in hook
+5. Added SCOPE RESTRICTION to prevent Module 2+ content
+
+**Next Steps:**
+1. Start dev server: `npm run dev`
+2. Test intake flow manually
+3. Watch console for `[useChatStream] Normalized phase` warnings
+4. Verify Claude stays in intake scope (no market questions)
 
 ---
 
 ## Metrics & Achievements
 
 ### Development Velocity
-- **Phases Completed:** 5/9 (55%)
-- **Development Time:** ~3 weeks
-- **Lines of Code:** ~19,000+
-- **Components Created:** 35+
+- **Phases Completed:** 5.2/9 (58%)
+- **Modules Implemented:** 2/10 (Intake + Geschäftsmodell)
+- **Development Time:** ~3.5 weeks
+- **Lines of Code:** ~21,000+
+- **Components Created:** 40+
 - **API Endpoints:** 8
+- **Phase Prompt Files:** 13 (8 intake + 5 geschaeftsmodell)
 - **Test Pass Rate:** 90%
 
 ### Cost Savings
