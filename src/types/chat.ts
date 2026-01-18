@@ -2,7 +2,14 @@
  * Chat API Types for GZ Businessplan Generator
  */
 
-import { GZModule } from '@/lib/prompts/prompt-loader';
+import type { GZModule } from '@/lib/prompts/prompt-loader';
+import type { IntakePhase, PartialIntakeOutput } from '@/types/modules/intake';
+import type { GeschaeftsmodellPhase, PartialGeschaeftsmodellOutput } from '@/types/modules/geschaeftsmodell';
+
+/**
+ * Union type for module data that can be passed to API
+ */
+export type ModuleData = PartialIntakeOutput | PartialGeschaeftsmodellOutput | null;
 
 /**
  * Message format for chat
@@ -22,6 +29,12 @@ export interface ChatRequest {
   currentModule?: GZModule;
   phase?: 'intake' | 'module' | 'validation' | 'document';
   includeCoaching?: boolean;
+  // Phase-locked intake support
+  intakePhase?: IntakePhase;
+  // Geschaeftsmodell phase support
+  geschaeftsmodellPhase?: GeschaeftsmodellPhase;
+  // Module data from previous phases (union type for all modules)
+  previousPhaseData?: ModuleData;
 }
 
 /**

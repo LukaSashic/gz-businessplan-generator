@@ -7,22 +7,48 @@ import {
   workshopDataFamily,
 } from '@/lib/state/workshop-atoms';
 import DocumentPreview from './document-preview';
-import { FileText, Loader2 } from 'lucide-react';
+import IntakePreview from './previews/intake-preview';
+import GeschaeftsmodellPreview from './previews/geschaeftsmodell-preview';
+import BusinessPlanPreview from './previews/businessplan-preview';
+import { FileText, Loader2, LayoutGrid, FileBarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { PartialIntakeOutput, IntakePhase } from '@/types/modules/intake';
+import type { PartialGeschaeftsmodellOutput, GeschaeftsmodellPhase } from '@/types/modules/geschaeftsmodell';
+import type { RedFlag } from '@/lib/services/red-flag-detector';
 
 interface PreviewPanelProps {
   workshopId: string;
+  moduleData?: any; // Real-time module data from chat stream
+  currentPhase?: string; // Current phase within the module
+  redFlags?: RedFlag[]; // Red flags detected in conversation
 }
 
-export default function PreviewPanel({ workshopId }: PreviewPanelProps) {
+type PreviewMode = 'data' | 'document';
+
+export default function PreviewPanel({
+  workshopId,
+  moduleData,
+  currentPhase,
+  redFlags = [],
+}: PreviewPanelProps) {
   const currentModule = useAtomValue(currentModuleAtom);
   const workshopDataAtom = workshopDataFamily(workshopId);
   const workshopData = useAtomValue(workshopDataAtom);
   const [markdownContent, setMarkdownContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('data');
 
-  // Generate markdown from workshop data
+  // Merge stored workshop data with real-time module data
+  const effectiveModuleData = moduleData || workshopData?.[currentModule || ''] || null;
+
+  // Generate markdown from workshop data (for non-intake modules)
   useEffect(() => {
+    if (currentModule === 'gz-intake') {
+      // IntakePreview handles its own rendering
+      return;
+    }
+
     if (!workshopData || !currentModule) {
       setMarkdownContent(getEmptyStateMarkdown());
       return;
@@ -31,12 +57,12 @@ export default function PreviewPanel({ workshopId }: PreviewPanelProps) {
     setIsLoading(true);
 
     // Get module data
-    const moduleData = workshopData[currentModule];
+    const storedModuleData = workshopData[currentModule];
 
-    if (!moduleData || Object.keys(moduleData).length === 0) {
+    if (!storedModuleData || Object.keys(storedModuleData).length === 0) {
       setMarkdownContent(getEmptyStateMarkdown(currentModule));
     } else {
-      setMarkdownContent(generateMarkdownForModule(currentModule, moduleData));
+      setMarkdownContent(generateMarkdownForModule(currentModule, storedModuleData));
     }
 
     setIsLoading(false);
@@ -61,16 +87,61 @@ export default function PreviewPanel({ workshopId }: PreviewPanelProps) {
       <div className="flex items-center justify-between border-b border-border bg-card px-6 py-4">
         <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-sm font-semibold">Dokumentvorschau</h2>
+          <h2 className="text-sm font-semibold">
+            {currentModule === 'gz-intake'
+              ? 'Gründerprofil'
+              : currentModule === 'gz-geschaeftsmodell'
+                ? 'Geschäftsmodell'
+                : 'Dokumentvorschau'}
+          </h2>
         </div>
+
+        {/* View Mode Toggle - Only show for intake module */}
+        {currentModule === 'gz-intake' && (
+          <Tabs value={previewMode} onValueChange={(v) => setPreviewMode(v as PreviewMode)} className="mx-4">
+            <TabsList className="h-8">
+              <TabsTrigger value="data" className="h-7 px-3 text-xs">
+                <LayoutGrid className="mr-1.5 h-3.5 w-3.5" />
+                Daten
+              </TabsTrigger>
+              <TabsTrigger value="document" className="h-7 px-3 text-xs">
+                <FileBarChart className="mr-1.5 h-3.5 w-3.5" />
+                Dokument
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
+
         <Button variant="outline" size="sm" disabled>
           Exportieren
         </Button>
       </div>
 
-      {/* Document Content */}
+      {/* Document Content - Module-specific rendering */}
       <div className="flex-1 overflow-y-auto">
-        <DocumentPreview content={markdownContent} />
+        {currentModule === 'gz-intake' ? (
+          // Intake module: Toggle between data cards and document preview
+          previewMode === 'data' ? (
+            <IntakePreview
+              data={effectiveModuleData as PartialIntakeOutput}
+              currentPhase={(currentPhase as IntakePhase) || 'warmup'}
+              redFlags={redFlags}
+            />
+          ) : (
+            <BusinessPlanPreview
+              workshopData={effectiveModuleData as PartialIntakeOutput}
+              currentModule={1}
+            />
+          )
+        ) : currentModule === 'gz-geschaeftsmodell' ? (
+          // Geschaeftsmodell module: Toggle between data cards and document preview
+          <GeschaeftsmodellPreview
+            data={effectiveModuleData as PartialGeschaeftsmodellOutput}
+            currentPhase={(currentPhase as GeschaeftsmodellPhase) || 'angebot'}
+          />
+        ) : (
+          <DocumentPreview content={markdownContent} />
+        )}
       </div>
     </div>
   );
