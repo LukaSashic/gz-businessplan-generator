@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Anthropic } from '@anthropic-ai/sdk';
 import { createClient } from '@/root-lib/supabase/server';
-import { getContextualPrompt, type GZModule } from '@/lib/prompts/prompt-loader';
+import {
+  getContextualPrompt,
+  buildIntakePhasePrompt,
+  buildGeschaeftsmodellPhasePrompt,
+  type GZModule,
+} from '@/lib/prompts/prompt-loader';
 import { chatRateLimiter, createRateLimitHeaders, createRateLimitError } from '@/lib/rate-limit';
+import type { IntakePhase, PartialIntakeOutput } from '@/types/modules/intake';
+import type { GeschaeftsmodellPhase, PartialGeschaeftsmodellOutput } from '@/types/modules/geschaeftsmodell';
 
 // Initialize Anthropic client
 const anthropic = new Anthropic({
@@ -16,6 +23,19 @@ interface ChatRequestBody {
   currentModule?: GZModule;
   phase?: 'intake' | 'module' | 'validation' | 'document';
   includeCoaching?: boolean;
+  // Phase-locked intake support
+  intakePhase?: IntakePhase;
+  previousPhaseData?: Partial<PartialIntakeOutput>;
+  // Phase-locked geschaeftsmodell support (Module 02)
+  geschaeftsmodellPhase?: GeschaeftsmodellPhase;
+  previousGeschaeftsmodellData?: Partial<PartialGeschaeftsmodellOutput>;
+  // Context from previous modules
+  intakeContext?: {
+    elevatorPitch?: string;
+    problem?: string;
+    solution?: string;
+    targetAudience?: string;
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -49,12 +69,17 @@ export async function POST(request: NextRequest) {
 
     // 3. Parse and validate request body
     const body: ChatRequestBody = await request.json();
-    const { 
-      messages, 
-      workshopId, 
-      currentModule, 
+    const {
+      messages,
+      workshopId,
+      currentModule,
       phase = 'module',
-      includeCoaching = true 
+      includeCoaching = true,
+      intakePhase,
+      previousPhaseData,
+      geschaeftsmodellPhase,
+      previousGeschaeftsmodellData,
+      intakeContext,
     } = body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -89,11 +114,34 @@ export async function POST(request: NextRequest) {
     // 5. Load appropriate system prompt
     let systemPrompt: string;
     try {
-      systemPrompt = await getContextualPrompt({
-        currentModule: body.currentModule,
-        phase,
-        includeCoaching,
-      });
+      // Check if this is a phase-locked request
+      const effectiveModule = body.currentModule || 'gz-intake';
+      const isIntakeModule = effectiveModule === 'gz-intake';
+      const isGeschaeftsmodellModule = effectiveModule === 'gz-geschaeftsmodell';
+
+      if (isIntakeModule && intakePhase) {
+        // Use phase-specific prompt for intake module
+        systemPrompt = await buildIntakePhasePrompt(intakePhase, {
+          includeCoaching,
+          previousPhaseData,
+        });
+        console.log(`[Chat API] Loaded phase-specific prompt for intake phase: ${intakePhase}`);
+      } else if (isGeschaeftsmodellModule && geschaeftsmodellPhase) {
+        // Use phase-specific prompt for geschaeftsmodell module (Module 02)
+        systemPrompt = await buildGeschaeftsmodellPhasePrompt(geschaeftsmodellPhase, {
+          includeCoaching,
+          previousPhaseData: previousGeschaeftsmodellData,
+          intakeData: intakeContext,
+        });
+        console.log(`[Chat API] Loaded phase-specific prompt for geschaeftsmodell phase: ${geschaeftsmodellPhase}`);
+      } else {
+        // Use standard contextual prompt (backward compatible)
+        systemPrompt = await getContextualPrompt({
+          currentModule: body.currentModule,
+          phase,
+          includeCoaching,
+        });
+      }
     } catch (error) {
       console.error('Failed to load system prompt:', error);
       return NextResponse.json(

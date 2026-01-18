@@ -200,10 +200,11 @@ export const CompetitorSchema = z.object({
 export type Competitor = z.infer<typeof CompetitorSchema>;
 
 // Competitive Analysis Schema
+// SPEC REFERENCE: gz-module-02-geschaeftsmodell.md - BA requires minimum 3 competitors
 export const CompetitiveAnalysisSchema = z.object({
-  directCompetitors: z.array(CompetitorSchema).min(0).max(5), // Minimum 3, max 5
-  competitiveAdvantages: z.array(z.string()), // Your key differentiators
-  marketGaps: z.array(z.string()), // What nobody offers (that customers want)
+  directCompetitors: z.array(CompetitorSchema).min(3, 'BA erfordert mindestens 3 Wettbewerber').max(5),
+  competitiveAdvantages: z.array(z.string()).min(2, 'Mindestens 2 Wettbewerbsvorteile angeben'),
+  marketGaps: z.array(z.string()).min(1, 'Mindestens 1 Marktlücke identifizieren'),
 });
 export type CompetitiveAnalysis = z.infer<typeof CompetitiveAnalysisSchema>;
 

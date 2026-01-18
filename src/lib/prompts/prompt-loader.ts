@@ -10,6 +10,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { IntakePhase, PartialIntakeOutput } from '@/types/modules/intake';
+import type { GeschaeftsmodellPhase, PartialGeschaeftsmodellOutput } from '@/types/modules/geschaeftsmodell';
 
 /**
  * Module names for GZ Businessplan Generator
@@ -171,6 +172,35 @@ const INTAKE_PHASE_COACHING: Record<IntakePhase, CoachingFragment[]> = {
 };
 
 /**
+ * Phase-specific prompt files for geschaeftsmodell module
+ * Each phase gets a focused prompt to prevent scope creep
+ */
+const GESCHAEFTSMODELL_PHASE_FILES: Record<GeschaeftsmodellPhase, string> = {
+  angebot: '01-angebot.md',
+  zielgruppe: '02-zielgruppe.md',
+  wertversprechen: '03-wertversprechen.md',
+  usp: '04-usp.md',
+  completed: '04-usp.md', // Use USP for completed state (module summary)
+};
+
+/**
+ * Reduced coaching stack for geschaeftsmodell phase-specific prompts
+ *
+ * RATIONALE:
+ * - angebot: CBC for challenging vague offering descriptions, AI for discovery
+ * - zielgruppe: CBC for challenging "alle" as target, MI for limiting beliefs
+ * - wertversprechen: CBC for enforcing customer perspective (not provider)
+ * - usp: CBC for challenging non-unique USP claims
+ */
+const GESCHAEFTSMODELL_PHASE_COACHING: Record<GeschaeftsmodellPhase, CoachingFragment[]> = {
+  angebot: ['gz-system-coaching-core', 'gz-coaching-cbc', 'gz-coaching-ai'],
+  zielgruppe: ['gz-system-coaching-core', 'gz-coaching-cbc', 'gz-coaching-mi'],
+  wertversprechen: ['gz-system-coaching-core', 'gz-coaching-cbc'],
+  usp: ['gz-system-coaching-core', 'gz-coaching-cbc'],
+  completed: ['gz-system-coaching-core'],
+};
+
+/**
  * Get the modules directory path
  */
 function getModulesDir(): string {
@@ -308,6 +338,62 @@ async function loadIntakeCommonRules(): Promise<string> {
     return content;
   } catch (error) {
     console.warn('Failed to load intake common rules', error);
+    return ''; // Non-critical, continue without common rules
+  }
+}
+
+/**
+ * Get the geschaeftsmodell phases directory path
+ */
+function getGeschaeftsmodellPhasesDir(): string {
+  return path.join(getModulesDir(), 'geschaeftsmodell-phases');
+}
+
+/**
+ * Load a geschaeftsmodell phase prompt file with caching
+ */
+async function loadGeschaeftsmodellPhaseFileCached(phase: GeschaeftsmodellPhase): Promise<string> {
+  const cacheKey = `geschaeftsmodell-phase:${phase}`;
+  const cached = promptCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && now - cached.timestamp < CACHE_TTL) {
+    return cached.content;
+  }
+
+  const fileName = GESCHAEFTSMODELL_PHASE_FILES[phase];
+  const filePath = path.join(getGeschaeftsmodellPhasesDir(), fileName);
+
+  try {
+    const content = await fs.readFile(filePath, 'utf-8');
+    promptCache.set(cacheKey, { content, timestamp: now });
+    return content;
+  } catch (error) {
+    console.warn(`Failed to load geschaeftsmodell phase file: ${fileName}`, error);
+    throw new Error(`Geschaeftsmodell phase file not found: ${fileName}`);
+  }
+}
+
+/**
+ * Load the common geschaeftsmodell rules
+ */
+async function loadGeschaeftsmodellCommonRules(): Promise<string> {
+  const cacheKey = 'geschaeftsmodell-phase:_common';
+  const cached = promptCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && now - cached.timestamp < CACHE_TTL) {
+    return cached.content;
+  }
+
+  const filePath = path.join(getGeschaeftsmodellPhasesDir(), '_common.md');
+
+  try {
+    const content = await fs.readFile(filePath, 'utf-8');
+    promptCache.set(cacheKey, { content, timestamp: now });
+    return content;
+  } catch (error) {
+    console.warn('Failed to load geschaeftsmodell common rules', error);
     return ''; // Non-critical, continue without common rules
   }
 }
@@ -526,6 +612,274 @@ FALSCH (diese Werte NIEMALS verwenden):
 2. Setze "phaseComplete": true erst wenn ALLE Pflichtfelder der Phase erfasst sind
 3. Übernimm alle bereits bekannten Daten in das JSON
 4. Das JSON MUSS in <json>...</json> Tags stehen`;
+}
+
+/**
+ * Format previous geschaeftsmodell phase data for context injection
+ */
+function formatPreviousGeschaeftsmodellPhaseData(
+  data: Partial<PartialGeschaeftsmodellOutput> | undefined,
+  intakeData?: { elevatorPitch?: string; problem?: string; solution?: string; targetAudience?: string }
+): string {
+  const sections: string[] = [];
+
+  // Include relevant intake data for context
+  if (intakeData) {
+    sections.push(`## Kontext aus Intake (Modul 01)
+- Geschäftsidee: ${intakeData.elevatorPitch || 'Noch nicht erfasst'}
+- Problem: ${intakeData.problem || 'Noch nicht erfasst'}
+- Lösung: ${intakeData.solution || 'Noch nicht erfasst'}
+- Initiale Zielgruppe: ${intakeData.targetAudience || 'Noch nicht erfasst'}`);
+  }
+
+  if (!data) {
+    if (sections.length === 0) return '';
+    return `
+---
+
+# KONTEXT: Bisher gesammelte Informationen
+
+${sections.join('\n\n')}
+
+---
+
+`;
+  }
+
+  if (data.offering) {
+    const offering = [];
+    if (data.offering.mainOffering) offering.push(`- Hauptangebot: ${data.offering.mainOffering}`);
+    if (data.offering.deliveryFormat) offering.push(`- Lieferformat: ${data.offering.deliveryFormat}`);
+    if (data.offering.pricingModel) offering.push(`- Preismodell: ${data.offering.pricingModel}`);
+    if (data.offering.oneSentencePitch) offering.push(`- Elevator Pitch: ${data.offering.oneSentencePitch}`);
+    if (data.offering.scope?.included?.length) {
+      offering.push(`- Inklusive: ${data.offering.scope.included.join(', ')}`);
+    }
+    if (data.offering.scope?.excluded?.length) {
+      offering.push(`- Exklusive: ${data.offering.scope.excluded.join(', ')}`);
+    }
+
+    if (offering.length > 0) {
+      sections.push(`## Bereits erfasstes Angebot (Phase 1)
+${offering.join('\n')}`);
+    }
+  }
+
+  if (data.targetAudience?.primaryPersona) {
+    const persona = data.targetAudience.primaryPersona;
+    const target = [];
+    if (persona.name) target.push(`- Name: ${persona.name}`);
+    if (persona.demographics?.occupation) target.push(`- Beruf: ${persona.demographics.occupation}`);
+    if (persona.demographics?.location) target.push(`- Standort: ${persona.demographics.location}`);
+    if (persona.buyingTrigger) target.push(`- Kaufauslöser: ${persona.buyingTrigger}`);
+    if (persona.psychographics?.challenges?.length) {
+      target.push(`- Herausforderungen: ${persona.psychographics.challenges.join(', ')}`);
+    }
+
+    if (data.targetAudience.marketSize?.serviceableMarket) {
+      target.push(`- Marktgröße (SAM): ${data.targetAudience.marketSize.serviceableMarket}`);
+    }
+    if (data.targetAudience.marketSize?.targetFirstYear) {
+      target.push(`- Zielkunden Jahr 1: ${data.targetAudience.marketSize.targetFirstYear}`);
+    }
+
+    if (target.length > 0) {
+      sections.push(`## Bereits erfasste Zielgruppe (Phase 2)
+${target.join('\n')}`);
+    }
+  }
+
+  if (data.valueProposition) {
+    const value = [];
+    if (data.valueProposition.customerJobs?.length) {
+      value.push(`- Kundenaufgaben: ${data.valueProposition.customerJobs.join(', ')}`);
+    }
+    if (data.valueProposition.customerPains?.length) {
+      value.push(`- Kundenprobleme: ${data.valueProposition.customerPains.join(', ')}`);
+    }
+    if (data.valueProposition.painRelievers?.length) {
+      value.push(`- Problemlöser: ${data.valueProposition.painRelievers.join(', ')}`);
+    }
+    if (data.valueProposition.valueStatement) {
+      value.push(`- Wertversprechen: ${data.valueProposition.valueStatement}`);
+    }
+
+    if (value.length > 0) {
+      sections.push(`## Bereits erfasstes Wertversprechen (Phase 3)
+${value.join('\n')}`);
+    }
+  }
+
+  if (data.competitiveAnalysis?.directCompetitors?.length) {
+    const competitors = data.competitiveAnalysis.directCompetitors
+      .map((c, i) => `${i + 1}. ${c.name || 'Unbenannt'}: ${c.offering || 'Kein Angebot'} (Stärke: ${c.strength || '-'}, Schwäche: ${c.weakness || '-'})`)
+      .join('\n');
+    sections.push(`## Bereits erfasste Wettbewerber (Phase 4)
+${competitors}`);
+  }
+
+  if (data.usp?.statement) {
+    sections.push(`## Bereits erfasster USP (Phase 4)
+- Statement: ${data.usp.statement}
+- Kategorie: ${data.usp.category || 'Nicht festgelegt'}
+- Beweis: ${data.usp.proof || 'Nicht festgelegt'}`);
+  }
+
+  if (sections.length === 0) return '';
+
+  return `
+---
+
+# KONTEXT: Bisher gesammelte Informationen
+
+${sections.join('\n\n')}
+
+---
+
+`;
+}
+
+/**
+ * Minimal orchestrator context for geschaeftsmodell phase prompts
+ */
+function getMinimalGeschaeftsmodellOrchestratorContext(): string {
+  return `# Gründungszuschuss Business Plan - Geschäftsmodell Modul
+
+Du führst ein strukturiertes Geschäftsmodell-Gespräch für den Gründungszuschuss-Workshop.
+
+## Kernregeln
+
+1. **Fokus auf aktuelle Phase**: Bearbeite NUR die Fragen der aktuellen Phase
+2. **Keine Abkürzungen**: Alle Pflichtfragen müssen beantwortet werden
+3. **Schrittweise vorgehen**: Max 2-3 Fragen pro Nachricht
+4. **Auf Deutsch**: Alle Kommunikation auf Deutsch
+5. **JSON-Ausgabe**: Jede Antwort endet mit einem JSON-Block
+6. **CBC anwenden**: Bei vagen Antworten IMMER nachfragen und konkretisieren
+
+## Coaching-Stil
+
+- Warm aber professionell und HERAUSFORDERND
+- Vage Antworten nicht akzeptieren - immer konkretisieren lassen
+- "Guter Service" → "Was genau meinst du mit 'gut'?"
+- "Alle" → "Wenn nur 10 kaufen könnten, welche 10?"
+- Konkret und hilfreich
+- Ermutigend ohne zu übertreiben`;
+}
+
+/**
+ * Phase-specific JSON output instructions for geschaeftsmodell
+ */
+function getGeschaeftsmodellPhaseJSONInstructions(phase: GeschaeftsmodellPhase): string {
+  return `
+---
+
+## KRITISCH: JSON-Ausgabe für Phase: ${phase}
+
+Nach JEDER Antwort, gib einen JSON-Block aus.
+
+**WICHTIG:** Der Wert für "currentPhase" MUSS EXAKT "${phase}" sein!
+
+Gültige Werte sind NUR: "angebot", "zielgruppe", "wertversprechen", "usp", "completed"
+
+RICHTIG:
+<json>
+{
+  "metadata": {
+    "currentPhase": "${phase}",
+    "phaseComplete": false
+  }
+}
+</json>
+
+FALSCH (diese Werte NIEMALS verwenden):
+- "currentPhase": "offering" ❌
+- "currentPhase": "target" ❌
+- "currentPhase": "value" ❌
+- "currentPhase": "unique" ❌
+
+**Regeln:**
+1. KOPIERE "currentPhase": "${phase}" GENAU SO - nicht ändern!
+2. Setze "phaseComplete": true erst wenn ALLE Pflichtfelder der Phase erfasst sind
+3. Übernimm alle bereits bekannten Daten in das JSON
+4. Das JSON MUSS in <json>...</json> Tags stehen`;
+}
+
+/**
+ * Build a phase-specific system prompt for the geschaeftsmodell module
+ *
+ * This is the phase-locked system for Module 02:
+ * - Focused prompts per phase (angebot, zielgruppe, wertversprechen, usp)
+ * - Forces Claude to focus on current phase objectives
+ * - Prevents skipping mandatory questions
+ * - Uses CBC coaching to challenge vague answers
+ *
+ * Layers:
+ * 1. Minimal orchestrator context
+ * 2. Phase-specific coaching (CBC focus)
+ * 3. Common geschaeftsmodell rules
+ * 4. Previous phase data (context carryover)
+ * 5. Phase-specific prompt
+ * 6. JSON output instructions
+ */
+export async function buildGeschaeftsmodellPhasePrompt(
+  phase: GeschaeftsmodellPhase,
+  options: {
+    includeCoaching?: boolean;
+    previousPhaseData?: Partial<PartialGeschaeftsmodellOutput>;
+    intakeData?: { elevatorPitch?: string; problem?: string; solution?: string; targetAudience?: string };
+  } = {}
+): Promise<string> {
+  const { includeCoaching = true, previousPhaseData, intakeData } = options;
+
+  const parts: string[] = [];
+
+  // Layer 1: Minimal orchestrator context
+  parts.push(getMinimalGeschaeftsmodellOrchestratorContext());
+
+  // Layer 2: Phase-specific coaching (CBC-heavy stack)
+  if (includeCoaching) {
+    const coachingStack = GESCHAEFTSMODELL_PHASE_COACHING[phase];
+    for (const fragment of coachingStack) {
+      try {
+        const coachingContent = await loadCoachingFragmentCached(fragment);
+        parts.push(coachingContent);
+      } catch (error) {
+        console.warn(`Failed to load coaching fragment for geschaeftsmodell phase: ${fragment}`);
+      }
+    }
+  }
+
+  // Layer 3: Common geschaeftsmodell rules
+  try {
+    const commonRules = await loadGeschaeftsmodellCommonRules();
+    if (commonRules) {
+      parts.push(commonRules);
+    }
+  } catch {
+    // Non-critical, continue
+  }
+
+  // Layer 4: Previous phase data injection
+  const contextData = formatPreviousGeschaeftsmodellPhaseData(previousPhaseData, intakeData);
+  if (contextData) {
+    parts.push(contextData);
+  }
+
+  // Layer 5: Phase-specific prompt
+  try {
+    const phasePrompt = await loadGeschaeftsmodellPhaseFileCached(phase);
+    parts.push(phasePrompt);
+  } catch (error) {
+    console.error(`Failed to load geschaeftsmodell phase prompt: ${phase}`, error);
+    // Fall back to generic geschaeftsmodell module
+    const genericModule = await loadModuleSkillCached('gz-geschaeftsmodell');
+    parts.push(genericModule);
+  }
+
+  // Layer 6: JSON output instructions
+  parts.push(getGeschaeftsmodellPhaseJSONInstructions(phase));
+
+  return parts.join('\n\n---\n\n');
 }
 
 /**
