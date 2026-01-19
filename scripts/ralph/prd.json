@@ -1,0 +1,72 @@
+{
+  "project": "GZ Businessplan Generator",
+  "version": "1.0.0",
+  "description": "Autonomous development tasks for GZ project",
+  "created": "2026-01-19",
+  "stories": [
+    {
+      "id": "GZ-001",
+      "title": "Example Story - Decimal.js Helper Functions",
+      "description": "Create helper functions for common financial calculations using decimal.js to ensure exact arithmetic throughout the application.",
+      "priority": "high",
+      "estimatedTokens": 15000,
+      "status": "pending",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "Create src/lib/finance/decimal-helpers.ts",
+        "Implement formatEUR(amount: Decimal): string with German formatting (1.234,56 €)",
+        "Implement parseGermanNumber(input: string): Decimal",
+        "Implement calculatePercentage(value: Decimal, percentage: Decimal): Decimal",
+        "All functions use decimal.js, no floating-point operations",
+        "Unit tests cover all functions with edge cases",
+        "TypeScript strict mode passes"
+      ],
+      "files": [
+        "src/lib/finance/decimal-helpers.ts",
+        "tests/unit/decimal-helpers.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-002",
+      "title": "Example Story - ZDR Header Verification",
+      "description": "Add a utility function to verify Zero Data Retention header is present in all Claude API configurations.",
+      "priority": "high",
+      "estimatedTokens": 10000,
+      "status": "pending",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "Create src/lib/claude/zdr-config.ts",
+        "Export DEFAULT_HEADERS with ZDR header",
+        "Create validateZDRHeader(headers: object): boolean function",
+        "Add JSDoc explaining DSGVO requirement",
+        "Unit tests verify header presence",
+        "TypeScript strict mode passes"
+      ],
+      "files": [
+        "src/lib/claude/zdr-config.ts",
+        "tests/unit/zdr-config.test.ts"
+      ]
+    }
+  ],
+  "metadata": {
+    "totalStories": 2,
+    "completedStories": 0,
+    "failedStories": 0,
+    "averageTokensPerStory": 12500
+  },
+  "instructions": {
+    "beforeAdding": [
+      "Read relevant skill file from src/lib/prompts/modules/",
+      "Break into atomic stories (<30k tokens each)",
+      "Include specific acceptance criteria",
+      "List files that will be created/modified"
+    ],
+    "statusValues": [
+      "pending",
+      "in_progress",
+      "completed",
+      "failed",
+      "blocked"
+    ]
+  }
+}

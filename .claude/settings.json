@@ -1,0 +1,82 @@
+{
+  "model": "claude-sonnet-4-20250514",
+  "thinking": true,
+  "preApproved": {
+    "commands": [
+      "npm",
+      "npx",
+      "git",
+      "gh",
+      "node",
+      "bun",
+      "pnpm",
+      "yarn",
+      "ast-grep",
+      "prettier",
+      "eslint",
+      "tsc"
+    ]
+  },
+  "hooks": {
+    "postToolUse": [
+      {
+        "tools": ["Write", "Edit"],
+        "command": "npx prettier --write {file}",
+        "description": "Auto-format files after writing"
+      }
+    ]
+  },
+  "mcps": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_URL": "${SUPABASE_DB_URL}"
+      },
+      "description": "Direct database queries for verification"
+    },
+    "browserbase": {
+      "command": "npx",
+      "args": ["-y", "@browserbasehq/mcp-server-browserbase"],
+      "env": {
+        "BROWSERBASE_API_KEY": "${BROWSERBASE_API_KEY}"
+      },
+      "description": "Browser automation for E2E testing"
+    }
+  },
+  "context": {
+    "alwaysInclude": [
+      "CLAUDE.md",
+      "PROGRESS.md",
+      "AGENTS.md"
+    ],
+    "exclude": [
+      "node_modules",
+      ".next",
+      ".git",
+      "*.lock"
+    ]
+  },
+  "gzProject": {
+    "description": "GZ Businessplan Generator - AI-powered German startup grant application",
+    "criticalRules": [
+      "All financial calculations MUST use decimal.js",
+      "All Claude API calls MUST include ZDR header (anthropic-beta: zdr-2024-10-22)",
+      "All interactive elements MUST have aria-labels",
+      "All database queries MUST respect RLS (user_id filter)"
+    ],
+    "skillsPath": "src/lib/prompts/modules",
+    "modules": [
+      "01-intake",
+      "02-geschaeftsmodell",
+      "03-unternehmen",
+      "04-markt-wettbewerb",
+      "05-marketing",
+      "06-finanzplanung",
+      "07-swot",
+      "08-meilensteine",
+      "09-kpi",
+      "10-zusammenfassung"
+    ]
+  }
+}
