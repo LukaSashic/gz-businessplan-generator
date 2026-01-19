@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Anthropic } from '@anthropic-ai/sdk';
+import { z } from 'zod';
 import { createClient } from '@/root-lib/supabase/server';
 import {
   getContextualPrompt,
@@ -8,35 +9,45 @@ import {
   type GZModule,
 } from '@/lib/prompts/prompt-loader';
 import { chatRateLimiter, createRateLimitHeaders, createRateLimitError } from '@/lib/rate-limit';
-import type { IntakePhase, PartialIntakeOutput } from '@/types/modules/intake';
-import type { GeschaeftsmodellPhase, PartialGeschaeftsmodellOutput } from '@/types/modules/geschaeftsmodell';
+import { createAnthropicConfig, getZDRHeaders, CLAUDE_CONFIG } from '@/lib/claude/zdr-config';
+import { IntakePhase as IntakePhaseSchema } from '@/types/modules/intake';
+import { GeschaeftsmodellPhase as GeschaeftsmodellPhaseSchema } from '@/types/modules/geschaeftsmodell';
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+// Initialize Anthropic client with ZDR (Zero Data Retention) headers for GDPR compliance
+const anthropic = new Anthropic(createAnthropicConfig());
+
+// Zod schema for request validation
+const MessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string().min(1, 'Message content cannot be empty'),
 });
 
-// Request body type
-interface ChatRequestBody {
-  messages: Array<{ role: 'user' | 'assistant'; content: string }>;
-  workshopId?: string;
-  currentModule?: GZModule;
-  phase?: 'intake' | 'module' | 'validation' | 'document';
-  includeCoaching?: boolean;
-  // Phase-locked intake support
-  intakePhase?: IntakePhase;
-  previousPhaseData?: Partial<PartialIntakeOutput>;
-  // Phase-locked geschaeftsmodell support (Module 02)
-  geschaeftsmodellPhase?: GeschaeftsmodellPhase;
-  previousGeschaeftsmodellData?: Partial<PartialGeschaeftsmodellOutput>;
+const IntakeContextSchema = z.object({
+  elevatorPitch: z.string().optional(),
+  problem: z.string().optional(),
+  solution: z.string().optional(),
+  targetAudience: z.string().optional(),
+}).optional();
+
+const ChatRequestSchema = z.object({
+  messages: z.array(MessageSchema).min(1, 'At least one message is required'),
+  workshopId: z.string().uuid().optional(),
+  currentModule: z.string().optional(),
+  phase: z.enum(['intake', 'module', 'validation', 'document']).default('module'),
+  includeCoaching: z.boolean().default(true),
+  // Phase-locked intake support - use actual IntakePhase enum
+  intakePhase: IntakePhaseSchema.optional(),
+  previousPhaseData: z.record(z.unknown()).optional(),
+  // Phase-locked geschaeftsmodell support (Module 02) - use actual GeschaeftsmodellPhase enum
+  geschaeftsmodellPhase: GeschaeftsmodellPhaseSchema.optional(),
+  previousGeschaeftsmodellData: z.record(z.unknown()).optional(),
   // Context from previous modules
-  intakeContext?: {
-    elevatorPitch?: string;
-    problem?: string;
-    solution?: string;
-    targetAudience?: string;
-  };
-}
+  intakeContext: IntakeContextSchema,
+  // Coaching state for quality tracking
+  coachingState: z.record(z.unknown()).optional(),
+});
+
+type ChatRequestBody = z.infer<typeof ChatRequestSchema>;
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,27 +78,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Parse and validate request body
-    const body: ChatRequestBody = await request.json();
+    // 3. Parse and validate request body with Zod
+    let body: ChatRequestBody;
+    try {
+      const rawBody = await request.json();
+      body = ChatRequestSchema.parse(rawBody);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return NextResponse.json(
+          {
+            error: 'Invalid request body',
+            details: error.errors.map(e => ({
+              path: e.path.join('.'),
+              message: e.message,
+            })),
+          },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
     const {
       messages,
       workshopId,
       currentModule,
-      phase = 'module',
-      includeCoaching = true,
+      phase,
+      includeCoaching,
       intakePhase,
       previousPhaseData,
       geschaeftsmodellPhase,
       previousGeschaeftsmodellData,
       intakeContext,
     } = body;
-
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: 'Invalid request: messages array required' },
-        { status: 400 }
-      );
-    }
 
     // 4. Verify workshop access (if workshopId provided)
     if (workshopId) {
@@ -151,21 +177,25 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Create streaming response with retry logic
+    // CRITICAL: ZDR headers are set in the Anthropic client via createAnthropicConfig()
+    // This ensures GDPR/DSGVO compliance - user data is NOT retained by Anthropic
     let stream;
     let retries = 0;
-    const maxRetries = 2;
+    const { maxRetries, baseDelayMs } = CLAUDE_CONFIG.retry;
 
     while (retries <= maxRetries) {
       try {
         stream = await anthropic.messages.stream({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          temperature: 0.7,
+          model: CLAUDE_CONFIG.model,
+          max_tokens: CLAUDE_CONFIG.maxTokens,
+          temperature: CLAUDE_CONFIG.temperature,
           system: systemPrompt,
           messages: messages.map((msg) => ({
             role: msg.role,
             content: msg.content,
           })),
+          // Explicit ZDR headers for this request (redundant with client defaults, but explicit is better)
+          ...getZDRHeaders(),
         });
         break; // Success, exit retry loop
       } catch (error) {
@@ -174,7 +204,7 @@ export async function POST(request: NextRequest) {
           throw error; // Re-throw after max retries
         }
         console.warn(`Retry ${retries}/${maxRetries} after error:`, error);
-        await new Promise(resolve => setTimeout(resolve, 1000 * retries)); // Exponential backoff
+        await new Promise(resolve => setTimeout(resolve, baseDelayMs * retries)); // Exponential backoff
       }
     }
 
@@ -182,13 +212,12 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to create stream after retries');
     }
 
-    // 7. Set up headers for streaming with Zero Data Retention
+    // 7. Set up headers for streaming response
+    // Note: ZDR headers are sent TO Claude API (in step 6), not in response to client
     const headers = new Headers({
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
-      // Critical: Zero Data Retention header for GDPR compliance
-      'anthropic-beta': 'prompt-caching-2024-07-31',
       ...createRateLimitHeaders(rateLimitResult),
     });
 

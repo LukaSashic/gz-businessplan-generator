@@ -6,7 +6,7 @@
   "prdVersion": "0.2",
   "metadata": {
     "totalStories": 45,
-    "completedStories": 1,
+    "completedStories": 3,
     "failedStories": 0,
     "totalTokensEstimated": 850000,
     "phases": [
@@ -60,7 +60,8 @@
       "description": "Define the 15 business types with their specific question variations, validation rules, and coaching focus areas.",
       "priority": "high",
       "estimatedTokens": 20000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-19T15:00:00Z",
       "dependencies": ["GZ-101"],
       "verificationMethod": "unit-tests",
       "riskLevel": "low",
@@ -117,7 +118,8 @@
       "description": "Implement the main chat API route with Claude streaming, Zero Data Retention header, and coaching context injection.",
       "priority": "high",
       "estimatedTokens": 25000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-19T14:25:00Z",
       "dependencies": ["GZ-101"],
       "verificationMethod": "integration",
       "riskLevel": "medium",
