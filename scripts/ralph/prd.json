@@ -1,119 +1,1081 @@
 {
   "project": "GZ Businessplan Generator",
-  "version": "2.0.0",
-  "description": "Autonomous development tasks for GZ project - Ryan Carson Ralph format",
+  "version": "1.0.0",
+  "description": "AI-powered business plan generator for German Gründungszuschuss applications with evidence-based coaching methodology",
   "created": "2026-01-19",
+  "prdVersion": "0.2",
   "metadata": {
-    "totalStories": 2,
+    "totalStories": 45,
     "completedStories": 0,
     "failedStories": 0,
-    "totalTokensEstimated": 35000,
-    "totalTokensActual": 0,
-    "totalCostEstimated": "$1.05"
+    "totalTokensEstimated": 850000,
+    "phases": [
+      "Phase 1: Foundation Infrastructure",
+      "Phase 2: Coaching Engine Core",
+      "Phase 3: Intake Module",
+      "Phase 4: Core Modules (Gründerperson, Geschäftsidee)",
+      "Phase 5: Market & Marketing Modules",
+      "Phase 6: Finanzplanung Module",
+      "Phase 7: Strategic Modules (SWOT, Meilensteine, Zusammenfassung)",
+      "Phase 8: Validation Engine",
+      "Phase 9: Document Generation"
+    ]
   },
   "userStories": [
     {
-      "id": "GZ-001",
-      "title": "Setup decimal.js infrastructure and utility functions",
-      "description": "Install decimal.js and create utility wrapper functions for German financial formatting. This is the foundation for all financial calculations in the project.",
+      "id": "GZ-101",
+      "phase": "Phase 1: Foundation Infrastructure",
+      "title": "Create workshop TypeScript types and Zod schemas",
+      "description": "Define all TypeScript interfaces and Zod validation schemas for workshop data, modules, user profiles, and coaching state.",
       "priority": "high",
-      "estimatedTokens": 15000,
+      "estimatedTokens": 25000,
       "passes": false,
       "dependencies": [],
       "verificationMethod": "unit-tests",
       "riskLevel": "low",
       "acceptanceCriteria": [
-        "decimal.js installed via npm (verify: package.json contains decimal.js)",
-        "Create src/lib/finance/decimal-helpers.ts",
-        "Implement formatEUR(amount: Decimal): string with German locale (1.234,56 €)",
-        "Implement parseGermanNumber(input: string): Decimal",
-        "Implement calculatePercentage(value: Decimal, percentage: Decimal): Decimal",
-        "All functions use decimal.js methods (.plus, .minus, .times, .dividedBy)",
-        "NO floating-point operators (+, -, *, /) in the file",
-        "Create tests/unit/decimal-helpers.test.ts",
-        "Test case: formatEUR(new Decimal('1234.56')) returns '1.234,56 €'",
-        "Test case: parseGermanNumber('1.234,56') returns Decimal('1234.56')",
-        "npm test passes with 100% coverage on this file",
-        "npm run type-check passes with no errors"
+        "Create src/types/workshop.ts with Workshop, Module, UserProfile interfaces",
+        "Create src/types/coaching.ts with CoachingState, Stage (TTM), ChangeT alkMetrics interfaces",
+        "Create src/types/modules.ts with specific interfaces for each of 10 modules",
+        "Create src/lib/schemas/workshop.ts with Zod schemas matching all interfaces",
+        "Create src/lib/schemas/coaching.ts with Zod schemas for coaching state",
+        "All types use strict TypeScript (no 'any')",
+        "Export types from src/types/index.ts barrel file",
+        "npm run type-check passes with zero errors"
       ],
       "files": [
-        "src/lib/finance/decimal-helpers.ts",
-        "tests/unit/decimal-helpers.test.ts"
-      ],
-      "completedAt": null,
-      "tokensCost": null
+        "src/types/workshop.ts",
+        "src/types/coaching.ts",
+        "src/types/modules.ts",
+        "src/types/index.ts",
+        "src/lib/schemas/workshop.ts",
+        "src/lib/schemas/coaching.ts"
+      ]
     },
     {
-      "id": "GZ-002",
-      "title": "Create ZDR header configuration for DSGVO compliance",
-      "description": "Add utility function and configuration to ensure Zero Data Retention header is present in all Claude API calls for DSGVO compliance.",
-      "priority": "high",
-      "estimatedTokens": 10000,
-      "passes": false,
-      "dependencies": [],
-      "verificationMethod": "unit-tests",
-      "riskLevel": "low",
-      "acceptanceCriteria": [
-        "Create src/lib/claude/zdr-config.ts",
-        "Export ZDR_HEADERS constant with 'anthropic-beta': 'zdr-2024-10-22'",
-        "Export getClaudeHeaders(): HeadersInit function that includes ZDR",
-        "Export validateZDRHeader(headers: HeadersInit): boolean function",
-        "Add JSDoc comments explaining DSGVO requirement and why ZDR is mandatory",
-        "Create tests/unit/zdr-config.test.ts",
-        "Test case: validateZDRHeader returns true when header present",
-        "Test case: validateZDRHeader returns false when header missing",
-        "npm test passes",
-        "npm run type-check passes with no errors"
-      ],
-      "files": [
-        "src/lib/claude/zdr-config.ts",
-        "tests/unit/zdr-config.test.ts"
-      ],
-      "completedAt": null,
-      "tokensCost": null
-    },
-    {
-      "id": "GZ-003",
-      "title": "Implement Kapitalbedarf calculation logic",
-      "description": "Calculate startup capital needs (Kapitalbedarf) with decimal.js for exact arithmetic. This is a core financial calculation for Gründungszuschuss applications.",
+      "id": "GZ-102",
+      "phase": "Phase 1: Foundation Infrastructure",
+      "title": "Create business type definitions and branching logic",
+      "description": "Define the 15 business types with their specific question variations, validation rules, and coaching focus areas.",
       "priority": "high",
       "estimatedTokens": 20000,
       "passes": false,
-      "dependencies": ["GZ-001"],
+      "dependencies": ["GZ-101"],
       "verificationMethod": "unit-tests",
-      "riskLevel": "medium",
+      "riskLevel": "low",
       "acceptanceCriteria": [
-        "Create src/lib/finance/kapitalbedarf.ts",
-        "Function accepts: gruendungskosten, anlaufkosten, reserve (all as string or Decimal)",
-        "Uses decimal.js for ALL arithmetic (.plus, .times, etc.)",
-        "Returns object with { total: Decimal, breakdown: {...} }",
-        "Create Zod schema for input validation",
-        "Test scenario: €50,000 GZ case validates correctly",
-        "Test: gruendungskosten=15000 + anlaufkosten=25000 + reserve=10000 = 50000",
-        "NO floating-point arithmetic (verify with ast-grep)",
-        "npm test passes with 100% coverage",
+        "Create src/lib/business-types/definitions.ts with 15 business type configs",
+        "Each type includes: id, name, description, questionVariations, validationRules, coachingFocus",
+        "Business types: Beratung, Agentur, Freiberufler, Gesundheit, E-Commerce, Einzelhandel, Hybrid-Handel, Handwerk, Gewerbe, Mobile-Dienste, Restaurant, FoodTruck, Catering, SaaS, IT-Dienstleistung",
+        "Create src/lib/business-types/branching.ts with getQuestionsForType() function",
+        "Create src/lib/business-types/index.ts barrel export",
+        "Unit tests verify each business type has required fields",
         "npm run type-check passes"
       ],
       "files": [
-        "src/lib/finance/kapitalbedarf.ts",
-        "tests/unit/kapitalbedarf.test.ts"
+        "src/lib/business-types/definitions.ts",
+        "src/lib/business-types/branching.ts",
+        "src/lib/business-types/index.ts",
+        "tests/unit/business-types.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-103",
+      "phase": "Phase 1: Foundation Infrastructure",
+      "title": "Create workshop state management with Jotai atoms",
+      "description": "Implement Jotai atoms for workshop state including current module, user data, coaching state, and IndexedDB persistence.",
+      "priority": "high",
+      "estimatedTokens": 22000,
+      "passes": false,
+      "dependencies": ["GZ-101"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/state/workshop-atoms.ts with workshopAtom, currentModuleAtom, userProfileAtom",
+        "Create src/lib/state/coaching-atoms.ts with coachingStateAtom, stageAtom, changeTalkAtom",
+        "Create src/lib/state/persistence.ts with IndexedDB storage adapter",
+        "Atoms persist to IndexedDB using atomWithStorage pattern",
+        "Create derived atoms: isModuleCompleteAtom, moduleProgressAtom",
+        "Handle hydration mismatch (SSR-safe)",
+        "Create src/lib/state/index.ts barrel export",
+        "Unit tests verify atom read/write and persistence",
+        "npm run type-check passes"
       ],
-      "completedAt": null,
-      "tokensCost": null
+      "files": [
+        "src/lib/state/workshop-atoms.ts",
+        "src/lib/state/coaching-atoms.ts",
+        "src/lib/state/persistence.ts",
+        "src/lib/state/index.ts",
+        "tests/unit/workshop-atoms.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-104",
+      "phase": "Phase 1: Foundation Infrastructure",
+      "title": "Create chat API route with Claude streaming and ZDR",
+      "description": "Implement the main chat API route with Claude streaming, Zero Data Retention header, and coaching context injection.",
+      "priority": "high",
+      "estimatedTokens": 25000,
+      "passes": false,
+      "dependencies": ["GZ-101"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/app/api/chat/route.ts with POST handler",
+        "Use Vercel AI SDK streamText with Claude claude-sonnet-4-20250514",
+        "CRITICAL: Include 'anthropic-beta': 'zdr-2024-10-22' header",
+        "Accept moduleId, messages, workshopId, coachingState in request body",
+        "Validate request with Zod schema",
+        "Inject module-specific system prompt based on moduleId",
+        "Return streaming response",
+        "Handle errors gracefully with proper status codes",
+        "Verify ZDR header present with grep test",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/app/api/chat/route.ts",
+        "src/lib/claude/zdr-config.ts",
+        "tests/integration/chat-api.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-105",
+      "phase": "Phase 1: Foundation Infrastructure",
+      "title": "Create Greta persona system prompt builder",
+      "description": "Build the system prompt generator that creates Greta's persona with coaching methodology, tone guidelines, and anti-patterns.",
+      "priority": "high",
+      "estimatedTokens": 28000,
+      "passes": false,
+      "dependencies": ["GZ-101", "GZ-102"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/greta-persona.ts with base persona definition",
+        "Include SDT foundation (autonomy, competence, relatedness) principles",
+        "Include tone of voice guidelines from PRD Section 7",
+        "Include FORBIDDEN patterns: 'du solltest', 'du musst', 'am besten', generic praise",
+        "Include REQUIRED patterns: open questions, empathy markers, reflective summaries",
+        "Create src/lib/prompts/prompt-builder.ts with buildSystemPrompt(moduleId, coachingState, userProfile)",
+        "System prompt varies by: module, user's stage (TTM), detected emotions",
+        "Export Sie/Du variants based on user preference",
+        "Unit tests verify forbidden patterns are documented",
+        "Unit tests verify prompt includes required sections",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/greta-persona.ts",
+        "src/lib/prompts/prompt-builder.ts",
+        "tests/unit/prompt-builder.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-201",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement TTM stage detection system",
+      "description": "Create the Transtheoretical Model stage detection that analyzes user language to classify readiness: Precontemplation, Contemplation, Preparation, Action.",
+      "priority": "high",
+      "estimatedTokens": 22000,
+      "passes": false,
+      "dependencies": ["GZ-101", "GZ-103"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/stage-detection.ts",
+        "Define Stage enum: PRECONTEMPLATION, CONTEMPLATION, PREPARATION, ACTION, MAINTENANCE",
+        "Create detectStage(messages: Message[]): Stage function",
+        "Detection based on language indicators from PRD Section 8",
+        "Precontemplation: 'weiß nicht', 'unsicher', 'vielleicht', 'keine Ahnung'",
+        "Contemplation: 'einerseits...andererseits', 'aber', 'Angst', 'Risiko'",
+        "Preparation: 'ich plane', 'nächsten Monat', 'konkret', 'erste Schritte'",
+        "Action: 'ich habe schon', 'bin dabei', 'läuft bereits'",
+        "Create getCoachingDepthForStage(stage: Stage): 'shallow' | 'medium' | 'deep'",
+        "Unit tests for each stage with example messages",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/stage-detection.ts",
+        "tests/unit/stage-detection.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-202",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement GROW model conversation structure",
+      "description": "Create the GROW model framework that structures each module conversation through Goal, Reality, Options, Will phases.",
+      "priority": "high",
+      "estimatedTokens": 20000,
+      "passes": false,
+      "dependencies": ["GZ-101", "GZ-105"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/grow-model.ts",
+        "Define GROWPhase enum: GOAL, REALITY, OPTIONS, WILL",
+        "Create getGROWPromptForPhase(phase, moduleId, userProfile): string",
+        "GOAL phase: 'Was willst DU mit diesem Modul erreichen?'",
+        "REALITY phase: 'Wo stehst du aktuell? Was hast du bereits?'",
+        "OPTIONS phase: 'Welche Möglichkeiten siehst du?'",
+        "WILL phase: 'Was nimmst du dir konkret vor?'",
+        "Include SDT integration for each phase (autonomy, competence, relatedness prompts)",
+        "Create detectGROWPhase(messages: Message[]): GROWPhase function",
+        "Unit tests verify prompt generation for each phase",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/grow-model.ts",
+        "tests/unit/grow-model.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-203",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement empathy simulation and emotion detection",
+      "description": "Create emotion detection from user messages and empathy response patterns following MI principles.",
+      "priority": "high",
+      "estimatedTokens": 23000,
+      "passes": false,
+      "dependencies": ["GZ-101"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/emotion-detection.ts",
+        "Define Emotion type: uncertainty, ambivalence, anxiety, frustration, excitement, confidence",
+        "Create detectEmotion(message: string): Emotion | null function",
+        "Detection signals: hesitation words, repetition, intensity markers",
+        "Create src/lib/coaching/empathy-patterns.ts",
+        "Implement pattern: [Emotion Label] + [Validation] + [Normalization] + [Pivot]",
+        "Create generateEmpathyResponse(emotion: Emotion): string function",
+        "Example: 'Angst ist eine völlig normale Reaktion bei so einer großen Entscheidung. Die meisten Gründer fühlen das am Anfang. Lass uns schauen, was diese Angst konkret auslöst.'",
+        "Unit tests for each emotion type",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/emotion-detection.ts",
+        "src/lib/coaching/empathy-patterns.ts",
+        "tests/unit/emotion-detection.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-204",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement reflective summary generator",
+      "description": "Create the reflective summarization system that generates summaries every 5-7 exchanges covering facts, emotions, and strengths.",
+      "priority": "high",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-101", "GZ-203"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/reflective-summary.ts",
+        "Create shouldGenerateSummary(exchangeCount: number): boolean (every 5-7)",
+        "Create generateSummaryPrompt(messages: Message[], userProfile): string",
+        "Summary structure: FAKTEN + EMOTIONALES + STÄRKEN",
+        "Include confirmation question: 'Stimmt das so? Fehlt etwas?'",
+        "Create extractFactsFromMessages(messages): string[]",
+        "Create extractEmotionalThemes(messages): string[]",
+        "Unit tests verify summary triggers at correct intervals",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/reflective-summary.ts",
+        "tests/unit/reflective-summary.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-205",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement coaching quality metrics tracker",
+      "description": "Create the system that tracks coaching quality metrics: autonomy instances, competence building, open questions, empathy markers, change talk ratio.",
+      "priority": "high",
+      "estimatedTokens": 25000,
+      "passes": false,
+      "dependencies": ["GZ-101", "GZ-201", "GZ-203"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/quality-metrics.ts",
+        "Define CoachingMetrics interface matching PRD Appendix G",
+        "Track: autonomy_instances (target ≥5), competence_instances (≥3), open_question_ratio (≥70%)",
+        "Track: empathy_marker_count (≥3), change_talk_count, sustain_talk_count",
+        "Track anti-patterns: advice_giving_count (target 0), leading_question_count (0)",
+        "Create analyzeMessage(message: string, role: 'user' | 'assistant'): MetricUpdate",
+        "Create calculateCoachingScore(metrics: CoachingMetrics): number (0-100, target ≥75)",
+        "Create getQualityWarnings(metrics): string[] for red flags",
+        "Unit tests verify metric calculations",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/quality-metrics.ts",
+        "tests/unit/quality-metrics.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-206",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement Motivational Interviewing (MI) techniques",
+      "description": "Create MI implementation with change talk detection, amplification, and the four principles: empathy, discrepancy, roll with resistance, self-efficacy.",
+      "priority": "high",
+      "estimatedTokens": 24000,
+      "passes": false,
+      "dependencies": ["GZ-101", "GZ-203"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/motivational-interviewing.ts",
+        "Define ChangeTalkType: DESIRE, ABILITY, REASON, NEED, COMMITMENT",
+        "Create detectChangeTalk(message: string): ChangeTalkType | null",
+        "Detect signals: 'will', 'möchte' (desire), 'kann', 'fähig' (ability), etc.",
+        "Create detectSustainTalk(message: string): boolean",
+        "Create generateMIResponse(changeTalkType, context): string",
+        "Implement amplify pattern: 'Das klingt wichtig. Erzähl mehr.'",
+        "Implement anchor pattern: 'Du hast also bewiesen, dass du X kannst.'",
+        "Create developDiscrepancy(currentState, desiredState): string prompt",
+        "Unit tests for each change talk type detection",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/motivational-interviewing.ts",
+        "tests/unit/motivational-interviewing.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-207",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement Cognitive Behavioral Coaching (CBC) for limiting beliefs",
+      "description": "Create CBC system to identify and reframe common founder limiting beliefs using the 5-step dialogue pattern.",
+      "priority": "medium",
+      "estimatedTokens": 22000,
+      "passes": false,
+      "dependencies": ["GZ-101"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/cbc-reframing.ts",
+        "Define common limiting beliefs from PRD: 'Ich bin kein Verkäufer', 'Der Markt ist zu gesättigt', 'Ich brauche erst X', 'Wenn ich scheitere ist alles verloren'",
+        "Create detectLimitingBelief(message: string): LimitingBelief | null",
+        "Implement 5-step CBC pattern: IDENTIFY → EVIDENCE CHECK → CHALLENGE → REFRAME → ACTION",
+        "Create generateCBCResponse(belief: LimitingBelief, step: CBCStep): string",
+        "Example: 'Ich bin kein Verkäufer' → 'Hast du schon mal jemanden von einer Idee überzeugt?'",
+        "Unit tests for each belief type",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/cbc-reframing.ts",
+        "tests/unit/cbc-reframing.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-208",
+      "phase": "Phase 2: Coaching Engine Core",
+      "title": "Implement Appreciative Inquiry strengths discovery",
+      "description": "Create the 4D cycle (Discover, Dream, Design, Destiny) for strengths-first coaching at intake and throughout modules.",
+      "priority": "medium",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-101"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/coaching/appreciative-inquiry.ts",
+        "Define AIPhase: DISCOVER, DREAM, DESIGN, DESTINY",
+        "Create getAIPromptForPhase(phase: AIPhase): string",
+        "DISCOVER: 'Erzähl mir von einem beruflichen Erfolg, auf den du stolz bist. Was hast du da gut gemacht?'",
+        "DREAM: 'Wenn dein Business in 3 Jahren genau so läuft, wie du es dir wünschst - wie sieht dein Alltag aus?'",
+        "DESIGN: 'Von deinen Stärken (X, Y) zu deinem Traum (Z) - welche Schritte brauchst du?'",
+        "DESTINY: 'Was ist der erste Schritt, den du diese Woche machst?'",
+        "Create extractStrengths(discoverResponse: string): string[] function",
+        "Unit tests for each phase prompt",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/coaching/appreciative-inquiry.ts",
+        "tests/unit/appreciative-inquiry.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-301",
+      "phase": "Phase 3: Intake Module",
+      "title": "Create Module 0 Intake prompt and flow",
+      "description": "Implement the Intake module with warm-up (Appreciative Inquiry DISCOVER), context gathering, business type selection, and stage detection.",
+      "priority": "high",
+      "estimatedTokens": 28000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-201", "GZ-208"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/intake.ts with full module prompt",
+        "Phase 1: Warm-up with Appreciative Inquiry DISCOVER",
+        "Phase 2: Basic context (name, status, since when, profession, qualifications)",
+        "Phase 3: Business idea capture with stage detection",
+        "Phase 4: Readiness assessment adapted to detected stage",
+        "Create IntakeOutput type with: userProfile, businessType, stage, strengths",
+        "Prompt instructs AI to use open questions, avoid advice-giving",
+        "Include transition to Module 1 with strengths reference",
+        "Integration test: complete intake flow with mock responses",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/intake.ts",
+        "src/types/modules/intake.ts",
+        "tests/integration/intake-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-302",
+      "phase": "Phase 3: Intake Module",
+      "title": "Create intake preview component",
+      "description": "Build the preview panel component that shows intake data as bullet points updating in real-time.",
+      "priority": "high",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-103", "GZ-301"],
+      "verificationMethod": "manual",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/components/preview/intake-preview.tsx",
+        "Display extracted data as bullet points",
+        "Sections: Persönliche Daten, Beruflicher Hintergrund, Geschäftsidee (Entwurf), Stärken-Profil",
+        "Update in real-time from Jotai atoms",
+        "Use shadcn/ui Card component",
+        "Include progress indicator (intake completion %)",
+        "Accessible: proper heading hierarchy, aria-labels",
+        "Responsive: works on mobile",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/components/preview/intake-preview.tsx",
+        "src/components/preview/index.ts"
+      ]
+    },
+    {
+      "id": "GZ-401",
+      "phase": "Phase 4: Core Modules",
+      "title": "Create Module 1 Gründerperson prompt with CBC",
+      "description": "Implement Gründerperson module focusing on founder qualification with Appreciative Inquiry continuation and CBC for limiting beliefs.",
+      "priority": "high",
+      "estimatedTokens": 25000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-207", "GZ-208", "GZ-301"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/gruenderperson.ts",
+        "Reference strengths from intake in opening",
+        "Question clusters: Beruflicher Hintergrund, Qualifikationen, Persönliche Stärken, Motivation",
+        "Include CBC handling for 'Ich bin nicht qualifiziert' belief",
+        "Include MI for developing discrepancy on motivation",
+        "Create GruenderpersonOutput type",
+        "GROW structure: Goal (what qualifications matter), Reality (what you have), Options (how to present), Will (confidence statement)",
+        "Integration test with mock conversation",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/gruenderperson.ts",
+        "src/types/modules/gruenderperson.ts",
+        "tests/integration/gruenderperson-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-402",
+      "phase": "Phase 4: Core Modules",
+      "title": "Create Module 2 Geschäftsidee prompt with Socratic depth",
+      "description": "Implement Geschäftsidee module with Socratic questioning at 5 depth levels and Clean Language principles.",
+      "priority": "high",
+      "estimatedTokens": 26000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-202", "GZ-401"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/geschaeftsidee.ts",
+        "Question clusters: Das Problem (L1-3), Die Lösung (L1-2), Zielgruppe (L2-4), USP (L3-5)",
+        "Implement Socratic depth levels from PRD",
+        "L1: Surface (What), L2: Justification (Why), L3: Assumption (What if), L4: Evidence (How do you know), L5: Alternative (What else)",
+        "Clean Language: use user's words, no presuppositions, no leading questions",
+        "Create GeschaeftsideeOutput type with: problem, solution, targetAudience, usp",
+        "Include YC tactics: 'Wer hat das Problem WIRKLICH?'",
+        "Integration test with mock conversation",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/geschaeftsidee.ts",
+        "src/types/modules/geschaeftsidee.ts",
+        "tests/integration/geschaeftsidee-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-403",
+      "phase": "Phase 4: Core Modules",
+      "title": "Create module preview components for Gründerperson and Geschäftsidee",
+      "description": "Build preview panel components for modules 1 and 2 showing extracted data as bullet points.",
+      "priority": "high",
+      "estimatedTokens": 20000,
+      "passes": false,
+      "dependencies": ["GZ-103", "GZ-401", "GZ-402"],
+      "verificationMethod": "manual",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/components/preview/gruenderperson-preview.tsx",
+        "Display: Berufserfahrung, Qualifikation, Kernkompetenz, Motivation, Stärken-Profil",
+        "Create src/components/preview/geschaeftsidee-preview.tsx",
+        "Display: Problem, Lösung, Zielgruppe, USP",
+        "Both use consistent card styling with shadcn/ui",
+        "Both update in real-time from Jotai atoms",
+        "Include completion percentage per module",
+        "Accessible with proper ARIA labels",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/components/preview/gruenderperson-preview.tsx",
+        "src/components/preview/geschaeftsidee-preview.tsx"
+      ]
+    },
+    {
+      "id": "GZ-501",
+      "phase": "Phase 5: Market & Marketing Modules",
+      "title": "Create Module 3 Markt & Wettbewerb with research integration",
+      "description": "Implement market analysis module with web research integration, YC reality checks, and evidence gathering.",
+      "priority": "high",
+      "estimatedTokens": 28000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-402"],
+      "verificationMethod": "integration",
+      "riskLevel": "high",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/markt-wettbewerb.ts",
+        "Question clusters: Marktgröße, Zielkunden, Wettbewerber, Differenzierung",
+        "Include research trigger points: 'Ich recherchiere jetzt...'",
+        "Reality check questions from YC tactics: 'Woher weißt du das?'",
+        "Create MarktWettbewerbOutput type with: marketSize, targetCustomers, competitors, differentiation",
+        "Include coaching depth: medium (reality check focus)",
+        "Handle overconfidence and fear patterns with MI",
+        "Integration test with mock research results",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/markt-wettbewerb.ts",
+        "src/types/modules/markt-wettbewerb.ts",
+        "tests/integration/markt-wettbewerb-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-502",
+      "phase": "Phase 5: Market & Marketing Modules",
+      "title": "Create Module 4 Marketing & Vertrieb with MI for sales resistance",
+      "description": "Implement marketing module with special handling for 'Ich bin kein Verkäufer' limiting belief using MI and CBC.",
+      "priority": "high",
+      "estimatedTokens": 26000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-206", "GZ-207", "GZ-501"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/marketing-vertrieb.ts",
+        "Question clusters: Kundenakquise, Kanäle, Preisgestaltung, Verkaufsprozess",
+        "Deep coaching focus: handle 'Ich bin kein Verkäufer' with CBC 5-step pattern",
+        "Use MI to elicit change talk about customer relationships",
+        "Adapt questions based on business type (B2B vs B2C)",
+        "Create MarketingVertriebOutput type",
+        "Include research for industry-specific marketing channels",
+        "Integration test with 'sales resistance' scenario",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/marketing-vertrieb.ts",
+        "src/types/modules/marketing-vertrieb.ts",
+        "tests/integration/marketing-vertrieb-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-503",
+      "phase": "Phase 5: Market & Marketing Modules",
+      "title": "Create Module 5 Organisation and Module 6 Rechtsform",
+      "description": "Implement simpler modules for organization structure and legal form with GROW-based decision support.",
+      "priority": "medium",
+      "estimatedTokens": 22000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-202", "GZ-502"],
+      "verificationMethod": "integration",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/organisation.ts",
+        "Questions: Team structure, capacity planning, partners, outsourcing",
+        "Light-medium coaching depth with GROW for realistic planning",
+        "Create OrganisationOutput type",
+        "Create src/lib/prompts/modules/rechtsform.ts",
+        "Questions: Legal form options, Meisterpflicht check, permits needed",
+        "Include business type branching (Handwerk → Meisterbrief check)",
+        "Options exploration for analysis paralysis",
+        "Create RechtsformOutput type",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/organisation.ts",
+        "src/lib/prompts/modules/rechtsform.ts",
+        "src/types/modules/organisation.ts",
+        "src/types/modules/rechtsform.ts"
+      ]
+    },
+    {
+      "id": "GZ-601",
+      "phase": "Phase 6: Finanzplanung Module",
+      "title": "Create Finanzplanung Teil A-C: Kapitalbedarf, Finanzierung, Privatentnahme",
+      "description": "Implement first three parts of financial planning with decimal.js calculations and CBC for number fears.",
+      "priority": "high",
+      "estimatedTokens": 28000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-207", "GZ-503"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "high",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/finanzplanung/kapitalbedarf.ts",
+        "Create src/lib/prompts/modules/finanzplanung/finanzierung.ts",
+        "Create src/lib/prompts/modules/finanzplanung/privatentnahme.ts",
+        "ALL calculations use decimal.js (verified with ast-grep)",
+        "Include CBC handling for 'Ich bin kein Zahlenmensch'",
+        "Scaffold approach: 'Wir machen das zusammen, Schritt für Schritt'",
+        "Create calculation functions in src/lib/finance/kapitalbedarf.ts",
+        "Test case: €50k GZ scenario (€15k Gründungskosten + €25k Anlauf + €10k Reserve)",
+        "German EUR formatting (1.234,56 €)",
+        "Unit tests verify exact calculations with decimal.js",
+        "ast-grep confirms no floating-point operators in finance files",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/finanzplanung/kapitalbedarf.ts",
+        "src/lib/prompts/modules/finanzplanung/finanzierung.ts",
+        "src/lib/prompts/modules/finanzplanung/privatentnahme.ts",
+        "src/lib/finance/kapitalbedarf.ts",
+        "src/lib/finance/finanzierung.ts",
+        "src/lib/finance/privatentnahme.ts",
+        "tests/unit/finanzplanung-a-c.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-602",
+      "phase": "Phase 6: Finanzplanung Module",
+      "title": "Create Finanzplanung Teil D-E: Umsatzplanung, Kostenplanung",
+      "description": "Implement revenue and cost planning with Socratic reality checks for wishful thinking.",
+      "priority": "high",
+      "estimatedTokens": 28000,
+      "passes": false,
+      "dependencies": ["GZ-601"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "high",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/finanzplanung/umsatzplanung.ts",
+        "3-year planning, monthly for year 1",
+        "Socratic reality check: 'Bei einem Tagessatz von €1.200 sind das 417 Tage. Bei 220 Arbeitstagen – wie erklärst du die Differenz?'",
+        "Create src/lib/prompts/modules/finanzplanung/kostenplanung.ts",
+        "Fixed vs variable costs, industry-specific categories",
+        "Create calculation functions with decimal.js",
+        "Business type variations (SaaS: MRR/Churn, Gastro: Wareneinsatz)",
+        "Test case: validate €500k year 1 claim with Socratic questions",
+        "Unit tests verify 3-year projection calculations",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/finanzplanung/umsatzplanung.ts",
+        "src/lib/prompts/modules/finanzplanung/kostenplanung.ts",
+        "src/lib/finance/umsatzplanung.ts",
+        "src/lib/finance/kostenplanung.ts",
+        "tests/unit/finanzplanung-d-e.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-603",
+      "phase": "Phase 6: Finanzplanung Module",
+      "title": "Create Finanzplanung Teil F-G: Rentabilität, Liquidität",
+      "description": "Implement profitability forecast and liquidity planning with break-even analysis.",
+      "priority": "high",
+      "estimatedTokens": 26000,
+      "passes": false,
+      "dependencies": ["GZ-602"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "high",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/finanzplanung/rentabilitaet.ts",
+        "3-year profitability forecast",
+        "Create src/lib/prompts/modules/finanzplanung/liquiditaet.ts",
+        "12-month detailed cash flow",
+        "Create src/lib/finance/break-even.ts with calculateBreakEven()",
+        "All calculations use decimal.js",
+        "Validation: liquidity never negative (block if fails)",
+        "Validation: break-even within 36 months (warning)",
+        "Test case: verify break-even calculation accuracy",
+        "Unit tests with €50k GZ scenario",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/finanzplanung/rentabilitaet.ts",
+        "src/lib/prompts/modules/finanzplanung/liquiditaet.ts",
+        "src/lib/finance/rentabilitaet.ts",
+        "src/lib/finance/liquiditaet.ts",
+        "src/lib/finance/break-even.ts",
+        "tests/unit/finanzplanung-f-g.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-604",
+      "phase": "Phase 6: Finanzplanung Module",
+      "title": "Create Finanzplanung preview component with live calculations",
+      "description": "Build the financial preview showing all 7 parts with real-time calculation updates.",
+      "priority": "high",
+      "estimatedTokens": 24000,
+      "passes": false,
+      "dependencies": ["GZ-103", "GZ-601", "GZ-602", "GZ-603"],
+      "verificationMethod": "manual",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/components/preview/finanzplanung-preview.tsx",
+        "Display all 7 sections: Kapitalbedarf, Finanzierung, Privatentnahme, Umsatz, Kosten, Rentabilität, Liquidität",
+        "Show key metrics: Gesamtkapitalbedarf, Break-Even Month, 3-Year Profit",
+        "Use German EUR formatting throughout",
+        "Include charts for 3-year projection (optional: recharts)",
+        "Real-time updates from Jotai atoms",
+        "Warning indicators for validation issues (red flags)",
+        "Accessible with proper ARIA labels",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/components/preview/finanzplanung-preview.tsx"
+      ]
+    },
+    {
+      "id": "GZ-701",
+      "phase": "Phase 7: Strategic Modules",
+      "title": "Create Module 8 SWOT with balanced assessment coaching",
+      "description": "Implement SWOT analysis module ensuring balanced strengths/weaknesses assessment.",
+      "priority": "medium",
+      "estimatedTokens": 20000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-603"],
+      "verificationMethod": "integration",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/swot.ts",
+        "Four quadrants: Strengths, Weaknesses, Opportunities, Threats",
+        "Coaching: ensure balance (not only positives OR negatives)",
+        "Cross-reference with previous modules for consistency",
+        "Create SWOTOutput type",
+        "Include Socratic prompts: 'Was könnte schiefgehen?' (for over-optimistic)",
+        "Include AI prompts: 'Welche Stärken hast du übersehen?' (for over-pessimistic)",
+        "Integration test with balanced output verification",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/swot.ts",
+        "src/types/modules/swot.ts",
+        "tests/integration/swot-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-702",
+      "phase": "Phase 7: Strategic Modules",
+      "title": "Create Module 9 Meilensteine with GROW Will phase",
+      "description": "Implement milestones module focusing on GROW Will phase for commitment and actionable planning.",
+      "priority": "medium",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-202", "GZ-701"],
+      "verificationMethod": "integration",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/meilensteine.ts",
+        "GROW Will phase focus: 'Was nimmst du dir konkret vor?'",
+        "Timeline alignment with Finanzplanung",
+        "Create MeilensteineOutput type with dated milestones",
+        "Avoid vague plans: require specific dates and actions",
+        "Include commitment language detection",
+        "Integration test verifying actionable outputs",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/meilensteine.ts",
+        "src/types/modules/meilensteine.ts",
+        "tests/integration/meilensteine-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-703",
+      "phase": "Phase 7: Strategic Modules",
+      "title": "Create Module 10 Zusammenfassung with celebration",
+      "description": "Implement executive summary module that auto-generates summary and anchors wins.",
+      "priority": "medium",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-105", "GZ-702"],
+      "verificationMethod": "integration",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/prompts/modules/zusammenfassung.ts",
+        "Auto-generate executive summary from all modules",
+        "Anchor wins: reference user's journey and growth",
+        "Light coaching: celebration mode",
+        "Create ZusammenfassungOutput type",
+        "Include next steps beyond workshop",
+        "Integration test verifying summary completeness",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/prompts/modules/zusammenfassung.ts",
+        "src/types/modules/zusammenfassung.ts",
+        "tests/integration/zusammenfassung-module.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-704",
+      "phase": "Phase 7: Strategic Modules",
+      "title": "Create preview components for SWOT, Meilensteine, Zusammenfassung",
+      "description": "Build preview panel components for strategic analysis modules.",
+      "priority": "medium",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-103", "GZ-701", "GZ-702", "GZ-703"],
+      "verificationMethod": "manual",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/components/preview/swot-preview.tsx with 4-quadrant display",
+        "Create src/components/preview/meilensteine-preview.tsx with timeline view",
+        "Create src/components/preview/zusammenfassung-preview.tsx with summary cards",
+        "Consistent styling with other preview components",
+        "Real-time updates from Jotai atoms",
+        "Accessible with proper ARIA labels",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/components/preview/swot-preview.tsx",
+        "src/components/preview/meilensteine-preview.tsx",
+        "src/components/preview/zusammenfassung-preview.tsx"
+      ]
+    },
+    {
+      "id": "GZ-801",
+      "phase": "Phase 8: Validation Engine",
+      "title": "Create inline validation system",
+      "description": "Implement real-time inline validation during conversation with Socratic challenges.",
+      "priority": "high",
+      "estimatedTokens": 24000,
+      "passes": false,
+      "dependencies": ["GZ-205", "GZ-601"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/validation/inline-validator.ts",
+        "Detect unrealistic numbers during input (e.g., €500k bei 1 Person)",
+        "Generate Socratic challenge: 'Lass uns gemeinsam rechnen...'",
+        "NOT judgmental: use questions, not statements",
+        "Create validation rules for each module",
+        "Financial thresholds: margins within 50% of industry, max 80% utilization",
+        "Create getInlineValidationPrompt(value, context): string | null",
+        "Unit tests for each validation rule",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/validation/inline-validator.ts",
+        "tests/unit/inline-validator.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-802",
+      "phase": "Phase 8: Validation Engine",
+      "title": "Create cross-module consistency checker",
+      "description": "Implement validation that checks consistency across modules and triggers correction prompts.",
+      "priority": "high",
+      "estimatedTokens": 22000,
+      "passes": false,
+      "dependencies": ["GZ-103", "GZ-801"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/validation/cross-module-validator.ts",
+        "Check: Zielgruppe matches between Geschäftsidee and Marketing",
+        "Check: Preise match between Geschäftsidee and Finanzplanung",
+        "Check: Personnel capacity matches revenue targets",
+        "Check: Meilensteine align with Finanzplanung timeline",
+        "Check: Kapitalbedarf includes all Organisation costs",
+        "Create detectInconsistencies(workshopState): Inconsistency[]",
+        "Create getCorrectionPrompt(inconsistency): string",
+        "Unit tests for each consistency check",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/validation/cross-module-validator.ts",
+        "tests/unit/cross-module-validator.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-803",
+      "phase": "Phase 8: Validation Engine",
+      "title": "Create BA compliance checker and final validation",
+      "description": "Implement final validation that ensures all BA requirements are met before export.",
+      "priority": "high",
+      "estimatedTokens": 24000,
+      "passes": false,
+      "dependencies": ["GZ-801", "GZ-802"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/validation/ba-compliance-checker.ts",
+        "Check all 10 BA-required sections complete",
+        "Create completeness score per module",
+        "Red flags report for critical issues",
+        "Financial validation: liquidity never negative (BLOCK), break-even within 36 months (WARNING)",
+        "Create src/lib/validation/final-validator.ts",
+        "Export blocked until critical issues resolved",
+        "Create ValidationReport type with sections, score, redFlags, canExport",
+        "Unit tests for BA requirements checklist",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/validation/ba-compliance-checker.ts",
+        "src/lib/validation/final-validator.ts",
+        "tests/unit/ba-compliance-checker.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-804",
+      "phase": "Phase 8: Validation Engine",
+      "title": "Create coaching quality validator",
+      "description": "Implement validation that monitors coaching quality metrics and triggers corrections when quality degrades.",
+      "priority": "medium",
+      "estimatedTokens": 20000,
+      "passes": false,
+      "dependencies": ["GZ-205"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/validation/coaching-quality-validator.ts",
+        "Monitor metrics from quality-metrics.ts",
+        "Red flags: autonomy < 2/module, empathy 0 when emotion detected, advice-giving > 3",
+        "Create getQualityCorrectionPrompt(metrics): string | null",
+        "Inject autonomy prompt when autonomy_instances < 2",
+        "Inject empathy prompt when emotion detected but 0 empathy markers",
+        "Force summary when > 10 exchanges without",
+        "Unit tests for each correction trigger",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/validation/coaching-quality-validator.ts",
+        "tests/unit/coaching-quality-validator.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-901",
+      "phase": "Phase 9: Document Generation",
+      "title": "Create .docx document generator",
+      "description": "Implement Word document generation with DIN 5008 formatting and all BA-required sections.",
+      "priority": "high",
+      "estimatedTokens": 28000,
+      "passes": false,
+      "dependencies": ["GZ-803"],
+      "verificationMethod": "integration",
+      "riskLevel": "high",
+      "acceptanceCriteria": [
+        "Create src/lib/export/docx-generator.ts",
+        "Use docx library for generation",
+        "DIN 5008 compliant formatting",
+        "All 10 BA-required sections in correct order",
+        "Include cover page with business name and founder",
+        "Include table of contents",
+        "Include financial tables with German EUR formatting",
+        "Include SWOT matrix",
+        "Include milestones timeline",
+        "Create generateBusinessplan(workshopState): Promise<Blob>",
+        "Integration test: generate and verify structure",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/export/docx-generator.ts",
+        "tests/integration/docx-generator.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-902",
+      "phase": "Phase 9: Document Generation",
+      "title": "Create export API route and download flow",
+      "description": "Implement API route for document generation and download UI flow.",
+      "priority": "high",
+      "estimatedTokens": 20000,
+      "passes": false,
+      "dependencies": ["GZ-803", "GZ-901"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/app/api/export/route.ts",
+        "Accept workshopId, validate with final-validator before export",
+        "Return 400 if validation fails with error details",
+        "Return .docx blob on success",
+        "Create src/components/export/export-button.tsx",
+        "Show validation status before allowing export",
+        "Show progress during generation",
+        "Trigger download on completion",
+        "Accessible button with proper aria-label",
+        "Integration test: complete export flow",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/app/api/export/route.ts",
+        "src/components/export/export-button.tsx",
+        "tests/integration/export-flow.test.ts"
+      ]
+    },
+    {
+      "id": "GZ-903",
+      "phase": "Phase 9: Document Generation",
+      "title": "Create PDF export option",
+      "description": "Add PDF export as secondary option alongside .docx.",
+      "priority": "medium",
+      "estimatedTokens": 18000,
+      "passes": false,
+      "dependencies": ["GZ-901"],
+      "verificationMethod": "integration",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/export/pdf-generator.ts",
+        "Use appropriate PDF library (e.g., pdf-lib or puppeteer)",
+        "DIN 5008 compliant formatting",
+        "Same structure as .docx export",
+        "Update export button to allow format selection",
+        "Integration test: generate PDF and verify",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/export/pdf-generator.ts",
+        "tests/integration/pdf-generator.test.ts"
+      ]
     }
   ],
   "instructions": {
     "storySize": "Each story must be completable in ONE Ralph iteration (<30k tokens)",
-    "acceptanceCriteria": "Must be verifiable - can be tested programmatically",
+    "acceptanceCriteria": "Must be verifiable - testable programmatically or with specific manual checks",
     "dependencies": "Story won't be picked until all dependencies have passes: true",
+    "criticalRules": [
+      "All financial calculations MUST use decimal.js - NO floating-point operators",
+      "All Claude API calls MUST include 'anthropic-beta': 'zdr-2024-10-22' header",
+      "All interactive elements MUST have aria-labels for accessibility",
+      "All coaching prompts MUST follow SDT principles (autonomy, competence, relatedness)",
+      "FORBIDDEN in AI responses: 'du solltest', 'du musst', 'am besten', generic praise without specifics"
+    ],
+    "testScenario": {
+      "name": "€50k GZ Standard Test Case",
+      "gruendungszuschuss": "€18,000 (6 months × €3,000)",
+      "gruendungskosten": "€15,000",
+      "anlaufkosten": "€25,000",
+      "reserve": "€10,000",
+      "total_kapitalbedarf": "€50,000"
+    },
     "workflow": [
       "1. Find first story with passes: false and all dependencies satisfied",
-      "2. Read relevant skill files from src/lib/prompts/modules/",
-      "3. Implement according to acceptance criteria",
-      "4. Run tests: npm test",
-      "5. Run type-check: npm run type-check",
-      "6. If all pass: git commit, update passes: true, log to progress.txt",
-      "7. If fail after 3 attempts: log blocker, move to next story"
+      "2. Read relevant coaching methodology from PRD Section 8",
+      "3. Read existing module prompts in src/lib/prompts/modules/",
+      "4. Implement according to acceptance criteria",
+      "5. Run tests: npm test",
+      "6. Run type-check: npm run type-check",
+      "7. If all pass: git commit, update passes: true, log to progress.txt",
+      "8. If fail after 3 attempts: log blocker, move to next story"
     ]
   }
 }
