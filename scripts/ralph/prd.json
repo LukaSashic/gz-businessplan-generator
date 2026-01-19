@@ -6,7 +6,7 @@
   "prdVersion": "0.2",
   "metadata": {
     "totalStories": 45,
-    "completedStories": 17,
+    "completedStories": 18,
     "failedStories": 0,
     "totalTokensEstimated": 850000,
     "phases": [
@@ -500,7 +500,8 @@
       "description": "Implement Geschäftsidee module with Socratic questioning at 5 depth levels and Clean Language principles.",
       "priority": "high",
       "estimatedTokens": 26000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-19T20:22:00Z",
       "dependencies": ["GZ-105", "GZ-202", "GZ-401"],
       "verificationMethod": "integration",
       "riskLevel": "medium",
@@ -528,7 +529,8 @@
       "description": "Build preview panel components for modules 1 and 2 showing extracted data as bullet points.",
       "priority": "high",
       "estimatedTokens": 20000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-19T21:00:00Z",
       "dependencies": ["GZ-103", "GZ-401", "GZ-402"],
       "verificationMethod": "manual",
       "riskLevel": "low",

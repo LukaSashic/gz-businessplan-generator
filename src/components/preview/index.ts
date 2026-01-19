@@ -5,3 +5,5 @@
  */
 
 export { IntakePreview } from './intake-preview';
+export { GruenderpersonPreview } from './gruenderperson-preview';
+export { GeschaeftsideePreview } from './geschaeftsidee-preview';
