@@ -4,8 +4,11 @@
  * All 10 module output types for the GZ Businessplan Generator.
  */
 
-// Module 01: Intake
+// Module 00: Intake
 export * from './intake';
+
+// Module 01: Gründerperson
+export * from './gruenderperson';
 
 // Module 02: Geschäftsmodell
 export * from './geschaeftsmodell';
