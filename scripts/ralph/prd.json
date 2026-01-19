@@ -6,7 +6,7 @@
   "prdVersion": "0.2",
   "metadata": {
     "totalStories": 45,
-    "completedStories": 11,
+    "completedStories": 13,
     "failedStories": 0,
     "totalTokensEstimated": 850000,
     "phases": [
@@ -210,7 +210,8 @@
       "description": "Create the GROW model framework that structures each module conversation through Goal, Reality, Options, Will phases.",
       "priority": "high",
       "estimatedTokens": 20000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-19T19:56:00Z",
       "dependencies": ["GZ-101", "GZ-105"],
       "verificationMethod": "unit-tests",
       "riskLevel": "low",
@@ -297,7 +298,8 @@
       "description": "Create the system that tracks coaching quality metrics: autonomy instances, competence building, open questions, empathy markers, change talk ratio.",
       "priority": "high",
       "estimatedTokens": 25000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-19T17:55:00Z",
       "dependencies": ["GZ-101", "GZ-201", "GZ-203"],
       "verificationMethod": "unit-tests",
       "riskLevel": "medium",
