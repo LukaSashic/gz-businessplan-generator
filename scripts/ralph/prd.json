@@ -1,72 +1,119 @@
 {
   "project": "GZ Businessplan Generator",
-  "version": "1.0.0",
-  "description": "Autonomous development tasks for GZ project",
+  "version": "2.0.0",
+  "description": "Autonomous development tasks for GZ project - Ryan Carson Ralph format",
   "created": "2026-01-19",
-  "stories": [
-    {
-      "id": "GZ-001",
-      "title": "Example Story - Decimal.js Helper Functions",
-      "description": "Create helper functions for common financial calculations using decimal.js to ensure exact arithmetic throughout the application.",
-      "priority": "high",
-      "estimatedTokens": 15000,
-      "status": "pending",
-      "dependencies": [],
-      "acceptanceCriteria": [
-        "Create src/lib/finance/decimal-helpers.ts",
-        "Implement formatEUR(amount: Decimal): string with German formatting (1.234,56 €)",
-        "Implement parseGermanNumber(input: string): Decimal",
-        "Implement calculatePercentage(value: Decimal, percentage: Decimal): Decimal",
-        "All functions use decimal.js, no floating-point operations",
-        "Unit tests cover all functions with edge cases",
-        "TypeScript strict mode passes"
-      ],
-      "files": [
-        "src/lib/finance/decimal-helpers.ts",
-        "tests/unit/decimal-helpers.test.ts"
-      ]
-    },
-    {
-      "id": "GZ-002",
-      "title": "Example Story - ZDR Header Verification",
-      "description": "Add a utility function to verify Zero Data Retention header is present in all Claude API configurations.",
-      "priority": "high",
-      "estimatedTokens": 10000,
-      "status": "pending",
-      "dependencies": [],
-      "acceptanceCriteria": [
-        "Create src/lib/claude/zdr-config.ts",
-        "Export DEFAULT_HEADERS with ZDR header",
-        "Create validateZDRHeader(headers: object): boolean function",
-        "Add JSDoc explaining DSGVO requirement",
-        "Unit tests verify header presence",
-        "TypeScript strict mode passes"
-      ],
-      "files": [
-        "src/lib/claude/zdr-config.ts",
-        "tests/unit/zdr-config.test.ts"
-      ]
-    }
-  ],
   "metadata": {
     "totalStories": 2,
     "completedStories": 0,
     "failedStories": 0,
-    "averageTokensPerStory": 12500
+    "totalTokensEstimated": 35000,
+    "totalTokensActual": 0,
+    "totalCostEstimated": "$1.05"
   },
+  "userStories": [
+    {
+      "id": "GZ-001",
+      "title": "Setup decimal.js infrastructure and utility functions",
+      "description": "Install decimal.js and create utility wrapper functions for German financial formatting. This is the foundation for all financial calculations in the project.",
+      "priority": "high",
+      "estimatedTokens": 15000,
+      "passes": false,
+      "dependencies": [],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "decimal.js installed via npm (verify: package.json contains decimal.js)",
+        "Create src/lib/finance/decimal-helpers.ts",
+        "Implement formatEUR(amount: Decimal): string with German locale (1.234,56 €)",
+        "Implement parseGermanNumber(input: string): Decimal",
+        "Implement calculatePercentage(value: Decimal, percentage: Decimal): Decimal",
+        "All functions use decimal.js methods (.plus, .minus, .times, .dividedBy)",
+        "NO floating-point operators (+, -, *, /) in the file",
+        "Create tests/unit/decimal-helpers.test.ts",
+        "Test case: formatEUR(new Decimal('1234.56')) returns '1.234,56 €'",
+        "Test case: parseGermanNumber('1.234,56') returns Decimal('1234.56')",
+        "npm test passes with 100% coverage on this file",
+        "npm run type-check passes with no errors"
+      ],
+      "files": [
+        "src/lib/finance/decimal-helpers.ts",
+        "tests/unit/decimal-helpers.test.ts"
+      ],
+      "completedAt": null,
+      "tokensCost": null
+    },
+    {
+      "id": "GZ-002",
+      "title": "Create ZDR header configuration for DSGVO compliance",
+      "description": "Add utility function and configuration to ensure Zero Data Retention header is present in all Claude API calls for DSGVO compliance.",
+      "priority": "high",
+      "estimatedTokens": 10000,
+      "passes": false,
+      "dependencies": [],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "low",
+      "acceptanceCriteria": [
+        "Create src/lib/claude/zdr-config.ts",
+        "Export ZDR_HEADERS constant with 'anthropic-beta': 'zdr-2024-10-22'",
+        "Export getClaudeHeaders(): HeadersInit function that includes ZDR",
+        "Export validateZDRHeader(headers: HeadersInit): boolean function",
+        "Add JSDoc comments explaining DSGVO requirement and why ZDR is mandatory",
+        "Create tests/unit/zdr-config.test.ts",
+        "Test case: validateZDRHeader returns true when header present",
+        "Test case: validateZDRHeader returns false when header missing",
+        "npm test passes",
+        "npm run type-check passes with no errors"
+      ],
+      "files": [
+        "src/lib/claude/zdr-config.ts",
+        "tests/unit/zdr-config.test.ts"
+      ],
+      "completedAt": null,
+      "tokensCost": null
+    },
+    {
+      "id": "GZ-003",
+      "title": "Implement Kapitalbedarf calculation logic",
+      "description": "Calculate startup capital needs (Kapitalbedarf) with decimal.js for exact arithmetic. This is a core financial calculation for Gründungszuschuss applications.",
+      "priority": "high",
+      "estimatedTokens": 20000,
+      "passes": false,
+      "dependencies": ["GZ-001"],
+      "verificationMethod": "unit-tests",
+      "riskLevel": "medium",
+      "acceptanceCriteria": [
+        "Create src/lib/finance/kapitalbedarf.ts",
+        "Function accepts: gruendungskosten, anlaufkosten, reserve (all as string or Decimal)",
+        "Uses decimal.js for ALL arithmetic (.plus, .times, etc.)",
+        "Returns object with { total: Decimal, breakdown: {...} }",
+        "Create Zod schema for input validation",
+        "Test scenario: €50,000 GZ case validates correctly",
+        "Test: gruendungskosten=15000 + anlaufkosten=25000 + reserve=10000 = 50000",
+        "NO floating-point arithmetic (verify with ast-grep)",
+        "npm test passes with 100% coverage",
+        "npm run type-check passes"
+      ],
+      "files": [
+        "src/lib/finance/kapitalbedarf.ts",
+        "tests/unit/kapitalbedarf.test.ts"
+      ],
+      "completedAt": null,
+      "tokensCost": null
+    }
+  ],
   "instructions": {
-    "beforeAdding": [
-      "Read relevant skill file from src/lib/prompts/modules/",
-      "Break into atomic stories (<30k tokens each)",
-      "Include specific acceptance criteria",
-      "List files that will be created/modified"
-    ],
-    "statusValues": [
-      "pending",
-      "in_progress",
-      "completed",
-      "failed",
-      "blocked"
+    "storySize": "Each story must be completable in ONE Ralph iteration (<30k tokens)",
+    "acceptanceCriteria": "Must be verifiable - can be tested programmatically",
+    "dependencies": "Story won't be picked until all dependencies have passes: true",
+    "workflow": [
+      "1. Find first story with passes: false and all dependencies satisfied",
+      "2. Read relevant skill files from src/lib/prompts/modules/",
+      "3. Implement according to acceptance criteria",
+      "4. Run tests: npm test",
+      "5. Run type-check: npm run type-check",
+      "6. If all pass: git commit, update passes: true, log to progress.txt",
+      "7. If fail after 3 attempts: log blocker, move to next story"
     ]
   }
 }

@@ -1,21 +1,40 @@
 # Ralph Progress Log
 # GZ Businessplan Generator
+# Started: 2026-01-19
 #
-# This file tracks Ralph's autonomous execution progress.
-# Each entry shows timestamp, story ID, and result.
+# Format:
+# === Action: Story-ID ===
+# Timestamp: YYYY-MM-DD HH:MM:SS
+# Details...
 #
-# Format: [YYYY-MM-DD HH:MM:SS] Action: Story-ID - Details
-#
+# Actions: STARTED, COMPLETED, BLOCKED, RETRY, SESSION ENDED
 
-=== Session Initialized ===
-Created: 2026-01-19
+=== INITIALIZED: Ralph Setup ===
+Timestamp: 2026-01-19 09:00:00
+Ralph configuration updated to Ryan Carson methodology v2.0
 
-[2026-01-19] Ralph setup complete
-[2026-01-19] PRD initialized with 2 example stories
-[2026-01-19] Waiting for first autonomous run
+Changes:
+- prd.json: Updated to use passes boolean, dependencies, estimatedTokens
+- ralph.sh: Added dependency checking, retry logic (3 attempts max)
+- prompt.md: Enhanced system prompt with GZ-specific requirements
+- AGENTS.md: Created folder-specific files for accumulated learnings
 
-# To start Ralph:
-# cd scripts/ralph
-# chmod +x ralph.sh
-# ./ralph.sh 25
+Ready for first autonomous run.
+
+=== NOTES: Critical Reminders ===
+- Financial calculations: ALWAYS decimal.js
+- Claude API: ALWAYS ZDR header (zdr-2024-10-22)
+- Accessibility: ALWAYS aria-labels
+- Database: ALWAYS respect RLS
+- TypeScript: NEVER use 'any'
+
+=== NOTES: Test Scenario ===
+€50,000 GZ Standard Test Case:
+- Gründungszuschuss: €18,000
+- Gründungskosten: €15,000
+- Anlaufkosten: €25,000
+- Reserve: €10,000
+- Total: €50,000
+
+Use this to validate all financial calculations.
 

@@ -9,6 +9,21 @@
 
 ---
 
+## Folder-Specific AGENTS.md Files
+
+For detailed domain-specific learnings, see:
+
+| File | Domain |
+|------|--------|
+| `src/lib/finance/AGENTS.md` | Financial calculations, decimal.js patterns |
+| `src/lib/state/AGENTS.md` | Jotai atoms, IndexedDB persistence |
+| `src/app/api/AGENTS.md` | API routes, authentication, ZDR header |
+| `src/components/AGENTS.md` | React components, accessibility, UI patterns |
+
+**Rule:** Update the most specific file. Root AGENTS.md is for cross-cutting concerns.
+
+---
+
 ## Critical Learnings (Read First)
 
 ### 1. Financial Calculations MUST Use decimal.js
