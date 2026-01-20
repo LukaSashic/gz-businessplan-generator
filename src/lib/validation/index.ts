@@ -12,3 +12,12 @@ export * from './inline-validator';
 
 // Cross-module consistency checker (GZ-802)
 export * from './cross-module-validator';
+
+// BA compliance validation system (GZ-803)
+export * from './ba-compliance-checker';
+export * from './final-validator';
+export * from './types';
+
+// Individual validation check modules
+export * from './checks/financial';
+export * from './checks/structure';
