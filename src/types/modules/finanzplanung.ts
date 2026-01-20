@@ -371,3 +371,142 @@ export function hasNegativeLiquidity(data: PartialFinanzplanungOutput): boolean 
   if (!data.liquiditaet?.monate) return false;
   return data.liquiditaet.monate.some((m) => (m.endbestand ?? 0) < 0);
 }
+
+// ============================================================================
+// Enhanced Analysis Types for GZ-603 (F-G Integration)
+// ============================================================================
+
+// Break-Even Analysis Types
+export const BreakEvenAnalysisSchema = z.object({
+  breakEvenUmsatzMonatlich: z.number(),
+  breakEvenUmsatzJaehrlich: z.number(),
+  deckungsbeitrag: z.number(),                     // Contribution margin %
+  deckungsbeitragEuro: z.number(),                // Contribution margin in EUR
+  breakEvenMonat: z.number().min(1).max(36).optional(),
+  isReachableIn36Months: z.boolean(),
+  monthsToBreakEven: z.number().optional(),
+  industryComparison: z.object({
+    isBelowAverage: z.boolean(),
+    isAboveWorrying: z.boolean(),
+    benchmarkComment: z.string(),
+  }),
+  warnings: z.array(z.string()),
+  recommendations: z.array(z.string()),
+});
+
+export type BreakEvenAnalysis = z.infer<typeof BreakEvenAnalysisSchema>;
+
+// Profitability Metrics Types
+export const ProfitabilityMetricsSchema = z.object({
+  revenueGrowthYear2: z.number(),                 // % growth Y1→Y2
+  revenueGrowthYear3: z.number(),                 // % growth Y2→Y3
+  avgAnnualGrowth: z.number(),                    // CAGR over 3 years
+  avgGrossMargin: z.number(),                     // % average over 3 years
+  avgOperatingMargin: z.number(),                 // % average over 3 years
+  avgNetMargin: z.number(),                       // % average over 3 years
+  marginTrend: z.enum(['improving', 'stable', 'declining']),
+  profitabilityRating: z.enum(['excellent', 'good', 'acceptable', 'concerning', 'poor']),
+});
+
+export type ProfitabilityMetrics = z.infer<typeof ProfitabilityMetricsSchema>;
+
+// Industry Benchmark Types
+export const IndustryBenchmarkSchema = z.object({
+  grossMarginTypical: z.number(),
+  operatingMarginTypical: z.number(),
+  netMarginTypical: z.number(),
+  comparison: z.object({
+    grossMarginVsBenchmark: z.number(),
+    operatingMarginVsBenchmark: z.number(),
+    netMarginVsBenchmark: z.number(),
+  }),
+  warnings: z.array(z.string()),
+  recommendations: z.array(z.string()),
+});
+
+export type IndustryBenchmark = z.infer<typeof IndustryBenchmarkSchema>;
+
+// Liquidity Risk Analysis Types
+export const LiquidityRiskAnalysisSchema = z.object({
+  minimumCash: z.number(),
+  minimumCashMonth: z.number(),
+  averageCash: z.number(),
+  monthsWithNegativeCash: z.number(),
+  maximumCashNeed: z.number(),
+  cashFlowVolatility: z.number(),
+  recommendedReserve: z.number(),
+  actualReserve: z.number(),
+  reserveShortfall: z.number(),
+  paymentRiskFactors: z.array(z.string()),
+  seasonalityWarnings: z.array(z.string()),
+  complianceRisks: z.array(z.string()),
+});
+
+export type LiquidityRiskAnalysis = z.infer<typeof LiquidityRiskAnalysisSchema>;
+
+// Liquidity Validation Types
+export const LiquidityValidationSchema = z.object({
+  hasNegativeLiquidity: z.boolean(),              // BLOCKER
+  hasInsufficientStartup: z.boolean(),            // BLOCKER
+  hasTightCashFlow: z.boolean(),                  // WARNING
+  hasHighVolatility: z.boolean(),                 // WARNING
+  hasSeasonalRisks: z.boolean(),                  // WARNING
+  actionItems: z.array(z.string()),
+  contingencyPlans: z.array(z.string()),
+});
+
+export type LiquidityValidation = z.infer<typeof LiquidityValidationSchema>;
+
+// Tax Analysis Types
+export const TaxAnalysisSchema = z.object({
+  effectiveRate: z.number(),                      // % actual tax rate
+  taxOptimizationPotential: z.array(z.string()),
+  taxRiskWarnings: z.array(z.string()),
+});
+
+export type TaxAnalysis = z.infer<typeof TaxAnalysisSchema>;
+
+// Enhanced Rentabilitaet with Analysis
+export const EnhancedRentabilitaetSchema = RentabilitaetSchema.extend({
+  breakEvenAnalysis: BreakEvenAnalysisSchema.optional(),
+  profitabilityMetrics: ProfitabilityMetricsSchema.optional(),
+  industryBenchmark: IndustryBenchmarkSchema.optional(),
+  taxAnalysis: TaxAnalysisSchema.optional(),
+});
+
+export type EnhancedRentabilitaet = z.infer<typeof EnhancedRentabilitaetSchema>;
+
+// Enhanced Liquidität with Risk Analysis
+export const EnhancedLiquiditaetSchema = LiquiditaetSchema.extend({
+  riskAnalysis: LiquidityRiskAnalysisSchema.optional(),
+  validation: LiquidityValidationSchema.optional(),
+});
+
+export type EnhancedLiquiditaet = z.infer<typeof EnhancedLiquiditaetSchema>;
+
+// Payment Terms Configuration
+export const PaymentTermsConfigSchema = z.object({
+  customerPaymentDays: z.number().min(0).max(180).default(45),
+  supplierPaymentDays: z.number().min(0).max(180).default(30),
+  variableCostPaymentDelay: z.number().min(0).max(180).default(30),
+});
+
+export type PaymentTermsConfig = z.infer<typeof PaymentTermsConfigSchema>;
+
+// Seasonality Configuration
+export const SeasonalityConfigSchema = z.object({
+  quarters: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+  description: z.string(),
+});
+
+export type SeasonalityConfig = z.infer<typeof SeasonalityConfigSchema>;
+
+// Complete Enhanced Output Schema
+export const EnhancedFinanzplanungOutputSchema = FinanzplanungOutputSchema.extend({
+  rentabilitaet: EnhancedRentabilitaetSchema,
+  liquiditaet: EnhancedLiquiditaetSchema,
+  paymentTerms: PaymentTermsConfigSchema.optional(),
+  seasonality: SeasonalityConfigSchema.optional(),
+});
+
+export type EnhancedFinanzplanungOutput = z.infer<typeof EnhancedFinanzplanungOutputSchema>;
