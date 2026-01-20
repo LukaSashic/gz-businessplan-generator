@@ -2,32 +2,51 @@ import { parseJSON } from 'partial-json';
 
 /**
  * Extract JSON blocks from streaming text
- * Looks for content between ```json and ``` markers
+ * Supports both markdown code blocks (```json ... ```) and XML tags (<json>...</json>)
  */
-export function extractJSONBlocks(text: string): Array<{ raw: string; parsed: any; isComplete: boolean }> {
-  const blocks: Array<{ raw: string; parsed: any; isComplete: boolean }> = [];
-  
-  // Pattern to match ```json ... ``` blocks
-  const jsonBlockRegex = /```json\s*([\s\S]*?)(?:```|$)/g;
+export function extractJSONBlocks(text: string): Array<{ raw: string; parsed: any; isComplete: boolean; type: 'markdown' | 'xml' }> {
+  const blocks: Array<{ raw: string; parsed: any; isComplete: boolean; type: 'markdown' | 'xml' }> = [];
+
+  // Pattern 1: Match ```json ... ``` blocks
+  const markdownRegex = /```json\s*([\s\S]*?)(?:```|$)/g;
   let match;
-  
-  while ((match = jsonBlockRegex.exec(text)) !== null) {
+
+  while ((match = markdownRegex.exec(text)) !== null) {
     const rawJSON = match[1]?.trim() || '';
     const isComplete = text.substring(match.index).includes('```', match[0].indexOf(rawJSON) + rawJSON.length);
-    
+
     if (rawJSON) {
       try {
-        // Try to parse with partial-json (handles incomplete JSON)
         const parsed = parseJSON(rawJSON);
-        blocks.push({ raw: rawJSON, parsed, isComplete });
+        blocks.push({ raw: rawJSON, parsed, isComplete, type: 'markdown' });
       } catch (error) {
-        // If even partial-json fails, include the raw text
-        console.warn('Failed to parse JSON block:', error);
-        blocks.push({ raw: rawJSON, parsed: null, isComplete });
+        console.warn('Failed to parse JSON block (markdown):', error);
+        blocks.push({ raw: rawJSON, parsed: null, isComplete, type: 'markdown' });
       }
     }
   }
-  
+
+  // Pattern 2: Match <json>...</json> blocks
+  const xmlRegex = /<json>\s*([\s\S]*?)(?:<\/json>|$)/g;
+
+  while ((match = xmlRegex.exec(text)) !== null) {
+    const rawJSON = match[1]?.trim() || '';
+    const isComplete = match[0].includes('</json>');
+
+    if (rawJSON) {
+      try {
+        const parsed = parseJSON(rawJSON);
+        blocks.push({ raw: rawJSON, parsed, isComplete, type: 'xml' });
+      } catch (error) {
+        console.warn('Failed to parse JSON block (xml):', error);
+        blocks.push({ raw: rawJSON, parsed: null, isComplete, type: 'xml' });
+      }
+    }
+  }
+
+  // Sort by position in text (to maintain order)
+  blocks.sort((a, b) => text.indexOf(a.raw) - text.indexOf(b.raw));
+
   return blocks;
 }
 

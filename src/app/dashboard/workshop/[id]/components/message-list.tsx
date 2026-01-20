@@ -6,6 +6,34 @@ import { User, Bot, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+/**
+ * Strip JSON blocks from assistant messages
+ * JSON is processed in the background for data extraction, but should not be shown to users
+ *
+ * This removes:
+ * - Markdown JSON code blocks: ```json...```
+ * - XML-style JSON tags: <json>...</json>
+ * - Plain JSON blocks starting with { on their own line
+ */
+function stripJSONBlocks(content: string): string {
+  let cleaned = content;
+
+  // Remove markdown JSON code blocks (```json...```)
+  cleaned = cleaned.replace(/```json[\s\S]*?```/g, '');
+
+  // Remove XML-style JSON tags (<json>...</json>)
+  cleaned = cleaned.replace(/<json>[\s\S]*?<\/json>/gi, '');
+
+  // Remove standalone JSON objects (lines starting with { and ending with })
+  // This is more conservative - only removes if it looks like the entire block is JSON
+  cleaned = cleaned.replace(/^\{[\s\S]*?\}$/gm, '');
+
+  // Clean up excess whitespace
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
+
+  return cleaned;
+}
+
 interface MessageListProps {
   messages: ChatMessage[];
   currentText: string;
@@ -20,17 +48,16 @@ export default function MessageList({
   return (
     <div className="space-y-4">
       {messages.map((message, index) => (
-        <MessageBubble key={message.id || index} message={message} />
+        <MessageBubble key={`msg-${index}-${message.timestamp || index}`} message={message} />
       ))}
 
       {/* Streaming message */}
       {isStreaming && currentText && (
         <MessageBubble
           message={{
-            id: 'streaming',
             role: 'assistant',
             content: currentText,
-            timestamp: new Date(),
+            timestamp: Date.now(),
           }}
           isStreaming
         />
@@ -62,6 +89,9 @@ interface MessageBubbleProps {
 function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
   const isUser = message.role === 'user';
 
+  // Strip JSON blocks from assistant messages so users only see coaching text
+  const displayContent = isUser ? message.content : stripJSONBlocks(message.content);
+
   return (
     <div className={cn('flex items-start gap-3', isUser && 'flex-row-reverse')}>
       {/* Avatar */}
@@ -85,7 +115,7 @@ function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
         )}
       >
         {isUser ? (
-          <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+          <p className="whitespace-pre-wrap text-sm">{displayContent}</p>
         ) : (
           <div className="prose prose-sm max-w-none dark:prose-invert">
             <ReactMarkdown
@@ -138,7 +168,7 @@ function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
                 ),
               }}
             >
-              {message.content}
+              {displayContent}
             </ReactMarkdown>
           </div>
         )}

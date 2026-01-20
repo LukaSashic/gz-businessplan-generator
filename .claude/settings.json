@@ -17,16 +17,7 @@
       "tsc"
     ]
   },
-  "hooks": {
-    "postToolUse": [
-      {
-        "tools": ["Write", "Edit"],
-        "command": "npx prettier --write {file}",
-        "description": "Auto-format files after writing"
-      }
-    ]
-  },
-  "mcps": {
+    "mcps": {
     "postgres": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres"],

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
+import { useSetAtom, useAtomValue } from 'jotai';
 import {
   currentWorkshopIdAtom,
   workshopsAtom,
-  currentModuleAtom,
+  streamingDataFamily,
 } from '@/lib/state/workshop-atoms';
 import { useAutoSave } from '@/lib/state/hooks';
 import ChatPanel from './chat-panel';
@@ -20,36 +20,33 @@ interface WorkshopCanvasProps {
 export default function WorkshopCanvas({ workshop }: WorkshopCanvasProps) {
   const setCurrentWorkshopId = useSetAtom(currentWorkshopIdAtom);
   const setWorkshops = useSetAtom(workshopsAtom);
-  const [currentModule, setCurrentModule] = useAtom(currentModuleAtom);
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState<'chat' | 'preview'>('chat');
+
+  // Get streaming data from chat
+  const streamingData = useAtomValue(streamingDataFamily(workshop.id));
 
   // Auto-save workshop data every 5 seconds
   const { updateData, isSaving, lastSaved } = useAutoSave(workshop.id);
 
-  // Initialize workshop state
+  // Initialize workshop state (runs once on mount)
   useEffect(() => {
+    setCurrentWorkshopId(workshop.id);
+
     // Add workshop to the list (or update if exists)
     setWorkshops((prev) => {
       const exists = prev.some((w) => w.id === workshop.id);
       if (exists) {
+        // Only update if workshop data actually changed
+        const existing = prev.find((w) => w.id === workshop.id);
+        if (JSON.stringify(existing) === JSON.stringify(workshop)) {
+          return prev; // Return same reference to avoid re-render
+        }
         return prev.map((w) => (w.id === workshop.id ? workshop : w));
       }
       return [...prev, workshop];
     });
-    setCurrentWorkshopId(workshop.id);
-
-    // Set initial module if not set
-    if (!currentModule) {
-      setCurrentModule('gz-intake');
-    }
-  }, [
-    workshop,
-    setCurrentWorkshopId,
-    setWorkshops,
-    currentModule,
-    setCurrentModule,
-  ]);
+  }, [workshop.id, setCurrentWorkshopId, setWorkshops, workshop]);
 
   // Detect mobile viewport
   useEffect(() => {
@@ -80,7 +77,12 @@ export default function WorkshopCanvas({ workshop }: WorkshopCanvasProps) {
 
           {/* Preview Panel - 60% */}
           <div className="flex w-3/5 flex-col">
-            <PreviewPanel workshopId={workshop.id} />
+            <PreviewPanel
+              workshopId={workshop.id}
+              moduleData={streamingData.moduleData}
+              currentPhase={streamingData.currentPhase}
+              redFlags={streamingData.redFlags || []}
+            />
           </div>
         </div>
       </div>
@@ -115,7 +117,12 @@ export default function WorkshopCanvas({ workshop }: WorkshopCanvasProps) {
         </TabsContent>
 
         <TabsContent value="preview" className="m-0 flex-1">
-          <PreviewPanel workshopId={workshop.id} />
+          <PreviewPanel
+            workshopId={workshop.id}
+            moduleData={streamingData.moduleData}
+            currentPhase={streamingData.currentPhase}
+            redFlags={streamingData.redFlags || []}
+          />
         </TabsContent>
       </Tabs>
     </div>

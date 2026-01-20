@@ -1,7 +1,10 @@
 /**
- * Module 04: Markt & Wettbewerb (Market & Competition) Types
+ * Module 04: Markt & Wettbewerb (Market & Competition) Types (GZ-501)
  *
- * Market analysis, competitor research, and positioning.
+ * Market analysis, competitor research, and positioning with:
+ * - YC reality check questions ("Woher weißt du das?")
+ * - Research trigger integration ("Ich recherchiere jetzt...")
+ * - MI handling for overconfidence and fear patterns
  */
 
 import { z } from 'zod';
@@ -11,20 +14,23 @@ import { z } from 'zod';
 // ============================================================================
 
 export const MarktWettbewerbPhase = z.enum([
-  'marktanalyse',      // Phase 1: Market analysis
+  'intro',             // Introduction with GROW Goal
+  'marktanalyse',      // Phase 1: Market analysis (TAM/SAM/SOM)
   'zielmarkt',         // Phase 2: Target market definition
   'wettbewerber',      // Phase 3: Competitor analysis
   'positionierung',    // Phase 4: Positioning
+  'reality_check',     // Phase 5: YC-style validation
   'completed',
 ]);
 
 export type MarktWettbewerbPhase = z.infer<typeof MarktWettbewerbPhase>;
 
 export const MarketTrend = z.enum([
-  'growing',     // Wachsend
-  'stable',      // Stabil
-  'declining',   // Rückläufig
-  'emerging',    // Entstehend
+  'growing_fast', // >10% jährliches Wachstum
+  'growing',      // 3-10% Wachstum
+  'stable',       // Stabil (0-3%)
+  'declining',    // Rückläufig
+  'emerging',     // Entstehend/Neu
 ]);
 
 export type MarketTrend = z.infer<typeof MarketTrend>;
@@ -37,6 +43,30 @@ export const CompetitorType = z.enum([
 ]);
 
 export type CompetitorType = z.infer<typeof CompetitorType>;
+
+/**
+ * Evidence quality for YC reality checks
+ */
+export const EvidenceQuality = z.enum([
+  'validated',   // Durch Gespräche/Tests validiert
+  'researched',  // Durch Recherche belegt
+  'assumed',     // Annahme ohne Beleg
+  'unknown',     // Unbekannt
+]);
+
+export type EvidenceQuality = z.infer<typeof EvidenceQuality>;
+
+/**
+ * Founder confidence level (for MI handling)
+ */
+export const ConfidenceLevel = z.enum([
+  'overconfident',  // Zu optimistisch, braucht Realitäts-Check
+  'confident',      // Angemessen zuversichtlich
+  'uncertain',      // Unsicher, braucht Unterstützung
+  'fearful',        // Ängstlich, braucht MI Empathie
+]);
+
+export type ConfidenceLevel = z.infer<typeof ConfidenceLevel>;
 
 // ============================================================================
 // Sub-Schemas
@@ -182,4 +212,265 @@ export function isMarktWettbewerbComplete(data: PartialMarktWettbewerbOutput): b
   const hasPosition = Boolean(data.positionierung?.positionStatement);
 
   return hasMarket && hasCompetitors && hasPosition;
+}
+
+// ============================================================================
+// YC Reality Check Schema (GZ-501)
+// ============================================================================
+
+/**
+ * YC-style reality checks for market assumptions
+ */
+export const YCRealityCheckSchema = z.object({
+  /** Key assumptions being tested */
+  assumptions: z.array(z.object({
+    assumption: z.string(),
+    evidence: z.string().optional(),
+    source: z.string().optional(),
+    status: z.enum(['validated', 'partially_validated', 'unvalidated', 'invalidated']),
+    nextStep: z.string().optional(),
+  })).optional(),
+  /** YC reality check questions answered */
+  ycQuestions: z.object({
+    /** Wer hat das Problem WIRKLICH? */
+    realProblemOwner: z.string().optional(),
+    /** Wie oft tritt das Problem auf? */
+    problemFrequency: z.string().optional(),
+    /** Wie viel würden sie für eine Lösung zahlen? */
+    willingnessTopay: z.string().optional(),
+    /** Was machen sie heute stattdessen? */
+    currentAlternatives: z.string().optional(),
+    /** Woher weißt du das? */
+    evidenceSource: z.string().optional(),
+  }).optional(),
+  /** Red flags identified */
+  redFlags: z.array(z.string()).optional(),
+  /** Validation needs */
+  validationNeeds: z.array(z.string()).optional(),
+  /** Overall market confidence */
+  marketConfidence: ConfidenceLevel.optional(),
+});
+
+export type YCRealityCheck = z.infer<typeof YCRealityCheckSchema>;
+
+// ============================================================================
+// Research Trigger Schema (GZ-501)
+// ============================================================================
+
+/**
+ * Research trigger tracking for "Ich recherchiere jetzt..."
+ */
+export const ResearchTriggerSchema = z.object({
+  /** Topic being researched */
+  topic: z.string(),
+  /** Research query/question */
+  query: z.string(),
+  /** Timestamp */
+  timestamp: z.string().optional(),
+  /** Results summary (if available) */
+  resultSummary: z.string().optional(),
+  /** Source URLs */
+  sources: z.array(z.string()).optional(),
+  /** Status */
+  status: z.enum(['pending', 'completed', 'failed']).optional(),
+});
+
+export type ResearchTrigger = z.infer<typeof ResearchTriggerSchema>;
+
+// ============================================================================
+// GROW Model Progress (GZ-501)
+// ============================================================================
+
+/**
+ * GROW model progress tracking for market module
+ */
+export const MarktGROWProgressSchema = z.object({
+  /** GOAL: What do you want to understand about your market? */
+  goal: z.string().optional(),
+  /** REALITY: What do you currently know/assume? */
+  reality: z.string().optional(),
+  /** OPTIONS: What research/validation options exist? */
+  options: z.array(z.string()).optional(),
+  /** WILL: What will you do to validate? */
+  will: z.string().optional(),
+});
+
+export type MarktGROWProgress = z.infer<typeof MarktGROWProgressSchema>;
+
+// ============================================================================
+// MI Confidence Handling (GZ-501)
+// ============================================================================
+
+/**
+ * Tracks founder confidence patterns for MI handling
+ */
+export const ConfidencePatternSchema = z.object({
+  /** Detected confidence level */
+  level: ConfidenceLevel,
+  /** Trigger phrase that indicated confidence level */
+  trigger: z.string().optional(),
+  /** MI response strategy used */
+  responseStrategy: z.enum([
+    'socratic_challenge',   // For overconfidence
+    'reality_check',        // For overconfidence
+    'empathy_express',      // For fear/uncertainty
+    'self_efficacy',        // For fear/uncertainty
+    'roll_with_resistance', // For resistance
+    'develop_discrepancy',  // For ambivalence
+  ]).optional(),
+  /** Outcome of intervention */
+  outcome: z.string().optional(),
+});
+
+export type ConfidencePattern = z.infer<typeof ConfidencePatternSchema>;
+
+// ============================================================================
+// Phase Info (GZ-501)
+// ============================================================================
+
+export const MarktWettbewerbPhaseInfo: Record<MarktWettbewerbPhase, {
+  label: string;
+  duration: number;
+  questionClusters: string[];
+  coachingDepth: 'shallow' | 'medium' | 'deep';
+}> = {
+  intro: {
+    label: 'Einführung',
+    duration: 5,
+    questionClusters: ['goal_setting'],
+    coachingDepth: 'shallow',
+  },
+  marktanalyse: {
+    label: 'Marktanalyse',
+    duration: 20,
+    questionClusters: ['tam_sam_som', 'market_trends', 'market_drivers'],
+    coachingDepth: 'medium',
+  },
+  zielmarkt: {
+    label: 'Zielmarkt',
+    duration: 20,
+    questionClusters: ['customer_segments', 'pain_points', 'buying_behavior'],
+    coachingDepth: 'medium',
+  },
+  wettbewerber: {
+    label: 'Wettbewerber',
+    duration: 25,
+    questionClusters: ['direct_competitors', 'indirect_competitors', 'competitive_factors'],
+    coachingDepth: 'medium',
+  },
+  positionierung: {
+    label: 'Positionierung',
+    duration: 15,
+    questionClusters: ['positioning', 'differentiators', 'competitive_advantages'],
+    coachingDepth: 'medium',
+  },
+  reality_check: {
+    label: 'Realitäts-Check',
+    duration: 10,
+    questionClusters: ['yc_questions', 'assumption_testing', 'validation_needs'],
+    coachingDepth: 'deep',
+  },
+  completed: {
+    label: 'Abgeschlossen',
+    duration: 0,
+    questionClusters: [],
+    coachingDepth: 'shallow',
+  },
+};
+
+// ============================================================================
+// Extended Output Schema (GZ-501)
+// ============================================================================
+
+/**
+ * Extended metadata including research and coaching info
+ */
+export const ExtendedMarktMetadataSchema = MarktMetadataSchema.extend({
+  /** GROW model progress */
+  growProgress: MarktGROWProgressSchema.optional(),
+  /** YC reality check results */
+  realityCheck: YCRealityCheckSchema.optional(),
+  /** Research triggers executed */
+  researchTriggers: z.array(ResearchTriggerSchema).optional(),
+  /** Confidence patterns detected */
+  confidencePatterns: z.array(ConfidencePatternSchema).optional(),
+  /** Research count */
+  researchCount: z.number().optional(),
+  /** Conversation turns */
+  conversationTurns: z.number().optional(),
+});
+
+export type ExtendedMarktMetadata = z.infer<typeof ExtendedMarktMetadataSchema>;
+
+/**
+ * Merge partial updates into existing data
+ */
+export function mergeMarktWettbewerbData(
+  existing: PartialMarktWettbewerbOutput,
+  update: PartialMarktWettbewerbOutput
+): PartialMarktWettbewerbOutput {
+  return {
+    marktanalyse: existing.marktanalyse || update.marktanalyse
+      ? { ...existing.marktanalyse, ...update.marktanalyse }
+      : undefined,
+    zielmarkt: existing.zielmarkt || update.zielmarkt
+      ? { ...existing.zielmarkt, ...update.zielmarkt }
+      : undefined,
+    wettbewerbsanalyse: existing.wettbewerbsanalyse || update.wettbewerbsanalyse
+      ? {
+          ...existing.wettbewerbsanalyse,
+          ...update.wettbewerbsanalyse,
+          competitors: [
+            ...(existing.wettbewerbsanalyse?.competitors || []),
+            ...(update.wettbewerbsanalyse?.competitors || []).filter(
+              (newComp) =>
+                !(existing.wettbewerbsanalyse?.competitors || []).some(
+                  (existingComp) => existingComp?.name === newComp?.name
+                )
+            ),
+          ],
+        }
+      : undefined,
+    positionierung: existing.positionierung || update.positionierung
+      ? { ...existing.positionierung, ...update.positionierung }
+      : undefined,
+    validation: existing.validation || update.validation
+      ? { ...existing.validation, ...update.validation }
+      : undefined,
+    metadata: { ...existing.metadata, ...update.metadata },
+  };
+}
+
+/**
+ * Calculate module completion percentage
+ */
+export function calculateMarktWettbewerbCompletion(data: PartialMarktWettbewerbOutput): number {
+  let score = 0;
+  const maxScore = 100;
+
+  // Market analysis (30 points)
+  if (data.marktanalyse?.marketName) score += 5;
+  if (data.marktanalyse?.tam?.value) score += 10;
+  if (data.marktanalyse?.sam?.value) score += 8;
+  if (data.marktanalyse?.som?.value) score += 7;
+
+  // Target market (20 points)
+  if (data.zielmarkt?.primarySegment) score += 10;
+  const segmentCount = data.zielmarkt?.customerSegments?.length || 0;
+  score += Math.min(segmentCount * 5, 10);
+
+  // Competitors (30 points)
+  const competitorCount = data.wettbewerbsanalyse?.competitors?.length || 0;
+  score += Math.min(competitorCount * 8, 24); // 3 competitors = 24 points
+  if (data.wettbewerbsanalyse?.marketGaps && data.wettbewerbsanalyse.marketGaps.length > 0) {
+    score += 6;
+  }
+
+  // Positioning (20 points)
+  if (data.positionierung?.positionStatement) score += 10;
+  if (data.positionierung?.differentiators && data.positionierung.differentiators.length > 0) {
+    score += 10;
+  }
+
+  return Math.min(Math.round((score / maxScore) * 100), 100);
 }

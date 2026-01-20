@@ -33,7 +33,7 @@ export function CreateWorkshopForm({ userId }: CreateWorkshopFormProps) {
           description: formData.business_description || null,
           business_name: formData.business_name,
           status: 'in_progress',
-          current_module: 'intake',
+          current_module: 'gz-intake',
           data: {},
         })
         .select()
@@ -45,7 +45,7 @@ export function CreateWorkshopForm({ userId }: CreateWorkshopFormProps) {
       }
 
       // Redirect to the workshop
-      router.push(`/workshop/${workshop.id}`);
+      router.push(`/dashboard/workshop/${workshop.id}`);
     } catch (error: any) {
       console.error('Full error object:', error);
       console.error('Error message:', error?.message);
