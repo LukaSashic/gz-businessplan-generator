@@ -12,6 +12,7 @@ import { chatRateLimiter, createRateLimitHeaders, createRateLimitError } from '@
 import { createAnthropicConfig, getZDRHeaders, CLAUDE_CONFIG } from '@/lib/claude/zdr-config';
 import { IntakePhase as IntakePhaseSchema } from '@/types/modules/intake';
 import { GeschaeftsmodellPhase as GeschaeftsmodellPhaseSchema } from '@/types/modules/geschaeftsmodell';
+import { getInlineValidationPrompt, type ValidationContext } from '@/lib/validation/inline-validator';
 
 // Initialize Anthropic client with ZDR (Zero Data Retention) headers for GDPR compliance
 const anthropic = new Anthropic(createAnthropicConfig());
@@ -176,7 +177,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 6. Create streaming response with retry logic
+    // 6. Inline validation - check for unrealistic inputs and inject Socratic challenges
+    const lastUserMessage = messages[messages.length - 1];
+    if (lastUserMessage && lastUserMessage.role === 'user') {
+      try {
+        const validationContext: ValidationContext = {
+          currentModule: body.currentModule || 'unknown',
+          userInput: lastUserMessage.content,
+          extractedNumbers: [], // Will be populated by validation function
+          businessType: intakeContext?.businessType, // Get from intake if available
+          conversationHistory: messages,
+        };
+
+        const validationPrompt = getInlineValidationPrompt(lastUserMessage.content, validationContext);
+
+        if (validationPrompt) {
+          // Inject Socratic challenge into system prompt
+          const challengeInjection = `\n\n=== INLINE VALIDATION CHALLENGE ===\n\n${validationPrompt.challenge}\n\nNote: This is a Socratic challenge based on potential unrealistic assumptions in the user's input. Address this gently as part of your response while maintaining the coaching conversation flow.\n\n=== END CHALLENGE ===`;
+
+          systemPrompt += challengeInjection;
+
+          console.log(`[Inline Validation] Triggered ${validationPrompt.type} validation (${validationPrompt.priority} priority): ${validationPrompt.reason}`);
+        }
+      } catch (validationError) {
+        // Log validation error but don't break the conversation flow
+        console.warn('[Inline Validation] Validation error:', validationError);
+      }
+    }
+
+    // 7. Create streaming response with retry logic
     // CRITICAL: ZDR headers are set in the Anthropic client via createAnthropicConfig()
     // This ensures GDPR/DSGVO compliance - user data is NOT retained by Anthropic
     let stream;
@@ -212,7 +241,7 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to create stream after retries');
     }
 
-    // 7. Set up headers for streaming response
+    // 8. Set up headers for streaming response
     // Note: ZDR headers are sent TO Claude API (in step 6), not in response to client
     const headers = new Headers({
       'Content-Type': 'text/event-stream',
@@ -221,7 +250,7 @@ export async function POST(request: NextRequest) {
       ...createRateLimitHeaders(rateLimitResult),
     });
 
-    // 8. Create readable stream for response
+    // 9. Create readable stream for response
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
