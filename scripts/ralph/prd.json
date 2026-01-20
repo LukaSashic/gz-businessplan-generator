@@ -6,7 +6,7 @@
   "prdVersion": "0.2",
   "metadata": {
     "totalStories": 45,
-    "completedStories": 22,
+    "completedStories": 23,
     "failedStories": 0,
     "totalTokensEstimated": 850000,
     "phases": [
@@ -1028,7 +1028,8 @@
       "description": "Implement API route for document generation and download UI flow.",
       "priority": "high",
       "estimatedTokens": 20000,
-      "passes": false,
+      "passes": true,
+      "completedAt": "2026-01-20T16:45:00Z",
       "dependencies": ["GZ-803", "GZ-901"],
       "verificationMethod": "integration",
       "riskLevel": "medium",
