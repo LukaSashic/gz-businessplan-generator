@@ -1,7 +1,12 @@
 /**
- * Module 07: SWOT-Analyse Types
+ * Module 8: SWOT Analysis Types (GZ-701)
  *
- * Strengths, Weaknesses, Opportunities, Threats analysis.
+ * SWOT analysis module ensuring balanced strengths/weaknesses assessment:
+ * - Four quadrants: Strengths, Weaknesses, Opportunities, Threats
+ * - Coaching for balance (not only positives OR negatives)
+ * - Cross-reference with previous modules for consistency
+ * - Socratic prompts for over-optimistic users
+ * - Appreciative Inquiry for over-pessimistic users
  */
 
 import { z } from 'zod';
@@ -11,11 +16,13 @@ import { z } from 'zod';
 // ============================================================================
 
 export const SWOTPhase = z.enum([
+  'intro',            // Introduction with balance assessment
   'staerken',         // Phase 1: Strengths
   'schwaechen',       // Phase 2: Weaknesses
   'chancen',          // Phase 3: Opportunities
   'risiken',          // Phase 4: Threats
   'strategien',       // Phase 5: Strategic implications
+  'validierung',      // Phase 6: Validation and consistency check
   'completed',
 ]);
 
@@ -32,6 +39,24 @@ export type SWOTQuadrant = z.infer<typeof SWOTQuadrant>;
 
 export const SWOTItemPriority = z.enum(['high', 'medium', 'low']);
 export type SWOTItemPriority = z.infer<typeof SWOTItemPriority>;
+
+export const BalanceLevel = z.enum([
+  'over_optimistic',    // Nur Positives, unrealistisch
+  'over_pessimistic',   // Nur Negatives, entmutigt
+  'balanced',           // Ausgewogene, realistische Einschätzung
+  'insufficient_data',  // Zu wenig Information
+]);
+
+export type BalanceLevel = z.infer<typeof BalanceLevel>;
+
+export const ConsistencyLevel = z.enum([
+  'consistent',         // Konsistent mit vorherigen Modulen
+  'minor_conflicts',    // Kleinere Widersprüche
+  'major_conflicts',    // Große Widersprüche
+  'insufficient_data',  // Zu wenig Information für Vergleich
+]);
+
+export type ConsistencyLevel = z.infer<typeof ConsistencyLevel>;
 
 // ============================================================================
 // Sub-Schemas
@@ -114,6 +139,33 @@ export const TOWSStrategienSchema = z.object({
 
 export type TOWSStrategien = z.infer<typeof TOWSStrategienSchema>;
 
+export const SWOTBalanceAssessmentSchema = z.object({
+  overallBalance: BalanceLevel,            // Gesamtbeurteilung der Balance
+  strengthsCount: z.number(),              // Anzahl identifizierter Stärken
+  weaknessesCount: z.number(),             // Anzahl identifizierter Schwächen
+  opportunitiesCount: z.number(),          // Anzahl identifizierter Chancen
+  threatsCount: z.number(),                // Anzahl identifizierter Risiken
+  balanceScore: z.number().min(0).max(100), // Balance-Score (100 = perfekte Balance)
+  coachingRecommendations: z.array(z.string()), // Coaching-Empfehlungen für bessere Balance
+});
+
+export type SWOTBalanceAssessment = z.infer<typeof SWOTBalanceAssessmentSchema>;
+
+export const SWOTConsistencyCheckSchema = z.object({
+  overallConsistency: ConsistencyLevel,    // Gesamtkonsistenz
+  conflicts: z.array(z.object({           // Identifizierte Konflikte
+    swotItem: z.string(),                 // Der SWOT-Punkt
+    conflictingModule: z.string(),        // Das widersprüchliche Modul
+    description: z.string(),              // Beschreibung des Konflikts
+    severity: z.enum(['minor', 'major']), // Schwere des Konflikts
+    suggestion: z.string(),               // Lösungsvorschlag
+  })),
+  moduleReferences: z.record(z.array(z.string())), // Verweise auf andere Module pro Quadrant
+  validatedItems: z.array(z.string()),    // Validierte SWOT-Punkte
+});
+
+export type SWOTConsistencyCheck = z.infer<typeof SWOTConsistencyCheckSchema>;
+
 export const SWOTValidationSchema = z.object({
   // Balance check
   isBalanced: z.boolean(),                // Not overly positive or negative
@@ -139,6 +191,9 @@ export const SWOTMetadataSchema = z.object({
   completedAt: z.string().optional(),
   duration: z.number().optional(),
   currentPhase: SWOTPhase.optional(),
+  balanceAssessments: z.array(SWOTBalanceAssessmentSchema).optional(), // Verlauf der Balance-Bewertungen
+  coachingInterventions: z.array(z.string()).optional(), // Coaching-Interventionen für Balance
+  conversationTurns: z.number().optional(),
 });
 
 export type SWOTMetadata = z.infer<typeof SWOTMetadataSchema>;
@@ -153,6 +208,8 @@ export const SWOTOutputSchema = z.object({
   chancen: ChancenSchema,
   risiken: RisikenSchema,
   strategien: TOWSStrategienSchema,
+  balanceAssessment: SWOTBalanceAssessmentSchema,
+  consistencyCheck: SWOTConsistencyCheckSchema,
   validation: SWOTValidationSchema,
   metadata: SWOTMetadataSchema,
 });
@@ -165,6 +222,8 @@ export const PartialSWOTOutputSchema = z.object({
   chancen: ChancenSchema.deepPartial().optional(),
   risiken: RisikenSchema.deepPartial().optional(),
   strategien: TOWSStrategienSchema.deepPartial().optional(),
+  balanceAssessment: SWOTBalanceAssessmentSchema.partial().optional(),
+  consistencyCheck: SWOTConsistencyCheckSchema.partial().optional(),
   validation: SWOTValidationSchema.partial().optional(),
   metadata: SWOTMetadataSchema.partial().optional(),
 });
@@ -204,3 +263,174 @@ export function isSWOTBalanced(data: PartialSWOTOutput): boolean {
   const ratio = positiveCount / negativeCount;
   return ratio >= 0.5 && ratio <= 2.0;
 }
+
+/**
+ * Assess balance level of SWOT analysis
+ */
+export function assessSWOTBalance(data: PartialSWOTOutput): BalanceLevel {
+  const strengthsCount = data.staerken?.items?.length || 0;
+  const weaknessesCount = data.schwaechen?.items?.length || 0;
+  const opportunitiesCount = data.chancen?.items?.length || 0;
+  const threatsCount = data.risiken?.items?.length || 0;
+
+  const totalCount = strengthsCount + weaknessesCount + opportunitiesCount + threatsCount;
+
+  if (totalCount < 4) return 'insufficient_data';
+
+  const positiveCount = strengthsCount + opportunitiesCount;
+  const negativeCount = weaknessesCount + threatsCount;
+
+  // Over-optimistic: >75% positive
+  if (positiveCount / totalCount > 0.75) return 'over_optimistic';
+
+  // Over-pessimistic: >75% negative
+  if (negativeCount / totalCount > 0.75) return 'over_pessimistic';
+
+  return 'balanced';
+}
+
+/**
+ * Get coaching intervention based on balance level
+ */
+export function getBalanceIntervention(balanceLevel: BalanceLevel): string[] {
+  switch (balanceLevel) {
+    case 'over_optimistic':
+      return [
+        "Ihre Analyse ist sehr positiv - das zeigt Optimismus! Lassen Sie uns auch realistische Herausforderungen betrachten.",
+        "Was könnte in den nächsten 12 Monaten schiefgehen?",
+        "Welche Schwächen könnten Ihnen Probleme bereiten?",
+        "Was würde Ihnen Sorgen machen, wenn Sie ehrlich sind?"
+      ];
+    case 'over_pessimistic':
+      return [
+        "Sie denken sehr kritisch - das zeigt, dass Sie Risiken ernst nehmen. Lassen Sie uns auch Ihre Stärken würdigen.",
+        "Welche Erfolge haben Sie bisher erreicht?",
+        "Was können Sie besser als andere?",
+        "Welche positiven Entwicklungen sind möglich?"
+      ];
+    case 'insufficient_data':
+      return [
+        "Lassen Sie uns systematisch durch alle vier Bereiche gehen.",
+        "Eine vollständige SWOT-Analyse hilft bei strategischen Entscheidungen."
+      ];
+    case 'balanced':
+      return [
+        "Ihre Analyse ist ausgewogen - das zeigt realistische Einschätzung!",
+        "So erhalten Sie ein klares Bild für strategische Entscheidungen."
+      ];
+  }
+}
+
+/**
+ * Calculate module completion percentage
+ */
+export function calculateSWOTCompletion(data: PartialSWOTOutput): number {
+  let score = 0;
+  const maxScore = 100;
+
+  // Each quadrant worth 25 points
+  const strengthsScore = Math.min((data.staerken?.items?.length || 0) * 8, 25);
+  const weaknessesScore = Math.min((data.schwaechen?.items?.length || 0) * 12, 25);
+  const opportunitiesScore = Math.min((data.chancen?.items?.length || 0) * 12, 25);
+  const threatsScore = Math.min((data.risiken?.items?.length || 0) * 12, 25);
+
+  score = strengthsScore + weaknessesScore + opportunitiesScore + threatsScore;
+
+  return Math.min(Math.round((score / maxScore) * 100), 100);
+}
+
+/**
+ * Merge partial updates into existing SWOT data
+ */
+export function mergeSWOTData(
+  existing: PartialSWOTOutput,
+  update: PartialSWOTOutput
+): PartialSWOTOutput {
+  return {
+    staerken: existing.staerken || update.staerken
+      ? { ...existing.staerken, ...update.staerken }
+      : undefined,
+    schwaechen: existing.schwaechen || update.schwaechen
+      ? { ...existing.schwaechen, ...update.schwaechen }
+      : undefined,
+    chancen: existing.chancen || update.chancen
+      ? { ...existing.chancen, ...update.chancen }
+      : undefined,
+    risiken: existing.risiken || update.risiken
+      ? { ...existing.risiken, ...update.risiken }
+      : undefined,
+    strategien: existing.strategien || update.strategien
+      ? { ...existing.strategien, ...update.strategien }
+      : undefined,
+    balanceAssessment: existing.balanceAssessment || update.balanceAssessment
+      ? { ...existing.balanceAssessment, ...update.balanceAssessment }
+      : undefined,
+    consistencyCheck: existing.consistencyCheck || update.consistencyCheck
+      ? { ...existing.consistencyCheck, ...update.consistencyCheck }
+      : undefined,
+    validation: existing.validation || update.validation
+      ? { ...existing.validation, ...update.validation }
+      : undefined,
+    metadata: { ...existing.metadata, ...update.metadata },
+  };
+}
+
+// ============================================================================
+// Phase Info
+// ============================================================================
+
+export const SWOTPhaseInfo: Record<SWOTPhase, {
+  label: string;
+  duration: number;
+  questionClusters: string[];
+  coachingDepth: 'shallow' | 'medium' | 'deep';
+}> = {
+  intro: {
+    label: 'Einführung SWOT',
+    duration: 5,
+    questionClusters: ['swot_overview', 'balance_check'],
+    coachingDepth: 'shallow',
+  },
+  staerken: {
+    label: 'Stärken',
+    duration: 10,
+    questionClusters: ['internal_strengths', 'competitive_advantages', 'past_successes'],
+    coachingDepth: 'medium',
+  },
+  schwaechen: {
+    label: 'Schwächen',
+    duration: 10,
+    questionClusters: ['internal_weaknesses', 'improvement_areas', 'skill_gaps'],
+    coachingDepth: 'medium',
+  },
+  chancen: {
+    label: 'Chancen',
+    duration: 10,
+    questionClusters: ['external_opportunities', 'market_trends', 'growth_potential'],
+    coachingDepth: 'medium',
+  },
+  risiken: {
+    label: 'Risiken',
+    duration: 10,
+    questionClusters: ['external_threats', 'competitive_risks', 'market_challenges'],
+    coachingDepth: 'medium',
+  },
+  strategien: {
+    label: 'Strategien',
+    duration: 10,
+    questionClusters: ['tows_combinations', 'strategic_options'],
+    coachingDepth: 'medium',
+  },
+  validierung: {
+    label: 'Validierung',
+    duration: 5,
+    questionClusters: ['consistency_check', 'balance_assessment'],
+    coachingDepth: 'shallow',
+  },
+  completed: {
+    label: 'Abgeschlossen',
+    duration: 0,
+    questionClusters: [],
+    coachingDepth: 'shallow',
+  },
+};
